@@ -1,0 +1,37 @@
+# Agents dans le marketing
+Ces agents prennent des décisions, conçoivent des workflows et utilisent des appels de fonctions pour se connecter à des outils externes et combler les lacunes de leurs connaissances.
+
+
+# CRM (Customer RelationShip Manager)
+System in Make Relation Good Between Clients and Company. Each interaction with client we store data into Odoo.
+
+
+# Agents AI besoin:
+- LLM + Outils (Gmail, CRM, ...) + Instructions
+
+# If I understand
+Each client has Data (Json File) That Contain Information like (behavior, history, and segmentation)
+
+
+# Tools
+No Code Like n8n OR with code like Langchain Or LanGraph
+
+
+# Platforms
+- Add Data: ajouter des donner de chaque clients OU un pdf pour extraire ca.
+- Dashbaord: Statistiques globales [Nombre de clients, Offres générées]
+- Generate Offre for Each Client Based on Historique, Profils Clients ou Context D'achat
+    // Agent Analyse --> Agent Segmentation --> Agent Génération --> Agent Scoring --> Agent Optimisation --> Offre finale
+- Improve Les Offres Genere a partir de prompt de user.
+
+
+
+# Questions
+- Ou le Data, se forme qoui, des ressources ... ?
+- Vision Global de projet ?
+
+
+
+
+
+
