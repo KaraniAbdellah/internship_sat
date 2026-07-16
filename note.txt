@@ -22,8 +22,17 @@ No Code Like n8n OR with code like Langchain Or LanGraph
 - Dashbaord: Statistiques globales [Nombre de clients, Offres générées]
 - Generate Offre for Each Client Based on Historique, Profils Clients ou Context D'achat
     // Agent Analyse --> Agent Segmentation --> Agent Génération --> Agent Scoring --> Agent Optimisation --> Offre finale
+- MoRandom forset for predict price for product and Custring for client segmentation
 - Improve Les Offres Genere a partir de prompt de user.
+- Pltform MicroServices --> each service has own part
 
+
+# Agents
+- Marketing Agent --> Generate Marketing Offres
+- Scoring Agent --> Based on Client Data Give Each Score (percentage) is that this client will buy or NO ?
+    [https://lelab0.com/agents-ia/lead-scoring/, ]
+- Validation Agent --> 
+- Optimisation Agent --> 
 
 
 # Questions
@@ -34,14 +43,30 @@ No Code Like n8n OR with code like Langchain Or LanGraph
 // https://www.canva.com/design/DAHOtz-JOFg/FxbtBKALDNpf-WSXkpC4tg/edit?ui=eyJBIjp7fX0
 
 
-Bonsoir Madame Chaimae,
-J'espère que vous allez bien.
-Je suis le stagiaire qui a récemment rejoint votre équipe et qui a pris le sujet de la génération des offres marketing basée sur les agents.J'ai également commencé le projet depuis la première réunion.
 
-J'ai commencé par explorer le monde des agents et le développement des agents avec LangGraph et J'ai essayé de trouver les données. 
-J'ai déjà préparé une présentation qui résume tout cela.
-Mais j'ai quelques questions, Madame.Concernant les données, j'ai trouvé plusieurs méthodes, parmi lesquelles:
-le scraping depuis des sites web, des bases de données déjà prêtes, ou des fichiers Excel.Ma première question est la suivante: est-ce que je dois utiliser un seul format de données (par exemple : client_uid, name, phone number, rating, product, etc.) pour toutes les sources ? En effet, dans mon projet, j'ai prévu de permettre à l'utilisateur d'importer ses propres fichiers afin de générer des offres, analyser les données des clients, etc.deuxième question: concernant la vision du projet. Est-ce que l'objectif est de créer une plateforme qui regroupe toutes les fonctionnalités liées à la génération des offres, à l'envoi des offres via des canaux comme WhatsApp, ainsi qu'à l'analyse et à la segmentation des clients ?Troisième question: je n'ai pas encore compris cette partie « Développer des modèles d’apprentissage automatique pour prédire les offres ». Pouvez-vous m'expliquer ce que cela signifie et quel est son objectif dans le projet ?
-Lien de presentation: https://canva.link/1mhxrg8d149ouy2Lient de Github: https://github.com/KaraniAbdellah/internship_sat
-Pour le moment, ce sont les questions que j'ai.Merci d'avance pour votre réponse.Cordialement, 
+# Design AI Agent System for Generate Marketing Offres
+- Goal: >= 70% Automation, Satisfaction > 4.5/5, Response 95% < 2.5s
+- Scope: Generating, Scoring, Validation and Optimisation
+- Workflow:
+    - Client Input: "I want to offer discount to tech professionals" + CLIENT DATA
+    - Agent 1 (Generation): Creates offer → "30% off Pro plan"
+    - Agent 2 (Scoring): Rates offer → "Score: 8/10"
+    - Agent 3 (Validation): Checks if valid → "Approved ✓" --> Based on Rules (max discount 50%, ...)
+    - Agent 4 (Optimization): Improves it → "Add urgency: 48hr deadline"
+    - Show Result: Client sees final optimized offer
+- Rules:
+    - Generate Marketing Offre Based on Client Data
+    - Score The Offre (0<=S<=100) and Predict churn 
+    - Validate The Offre (Human Validation)
+    - Optimise The Offre (Suggest Optimisation on Some Parts)
+- Backend and Database
+    - Data Storage to Relation Database or Vector DB
+- Tips:
+    - skill.md
+    - Agent-to-Agent Communication
+
+
+
+
+
 
