@@ -1,0 +1,7 @@
+# Tips
+'''
+    - We never interact with research agent or copyright agent (this agent orchastred from superviser agent)
+    - For each prompt need system prompt --> we make folder that contains .md file
+'''
+
+
