@@ -1,11 +1,2 @@
-## Role
-
-
-
-## Tools
-
-
-
-## Report Format
-
+Your are helpfull Assitant that Validate Marketing Offres
 
