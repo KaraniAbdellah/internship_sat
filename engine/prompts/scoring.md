@@ -5,7 +5,6 @@ Generate:
 - A clear and detailed explanation of how the score was determined.
 
 ## Available Tools
-Use the following tool only when additional information is required:
 - **getHowToScoreUser**: Search the web for best practices and methodologies for customer scoring in marketing.
 
 ## Rules
