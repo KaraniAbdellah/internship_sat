@@ -3,11 +3,30 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, Globe, Menu, X } from 'lucide-react';
 import image from '../../../assets/optimic.png';
 
-const NAV_ITEMS = [
+interface NavChildItem {
+  label: string;
+  href: string;
+}
+
+interface NavItem {
+  label: string;
+  href: string;
+  active?: boolean;
+  children?: NavChildItem[];
+}
+
+const NAV_ITEMS: NavItem[] = [
   { label: 'Home', href: '/', active: true },
   { label: 'About', href: '#about' },
   { label: 'Pricing', href: '#pricing' },
-  { label: 'Solution', href: '#solution' },
+  {
+    label: 'Solution',
+    href: '#solution',
+    children: [
+      { label: 'Analytics', href: '#analytics' },
+      { label: 'Automation', href: '#automation' },
+    ],
+  },
   { label: 'Dashboard', href: '/optimic' },
 ];
 
@@ -198,18 +217,35 @@ export default function Header() {
               {/* Phone Navigation Links */}
               <div className="flex flex-col gap-1">
                 {NAV_ITEMS.map((item, index) => (
-                  <a
-                    key={index}
-                    href={item.href}
-                    onClick={() => setMobileMenuOpen(false)}
-                    className={`px-4 py-3 rounded-2xl text-base font-semibold transition-colors ${
-                      item.active
-                        ? 'bg-slate-100 text-[#ff1d00]'
-                        : 'text-slate-700 hover:bg-slate-50 hover:text-slate-900'
-                    }`}
-                  >
-                    {item.label}
-                  </a>
+                  <div key={index} className="flex flex-col">
+                    <a
+                      href={item.href}
+                      onClick={() => setMobileMenuOpen(false)}
+                      className={`px-4 py-3 rounded-2xl text-base font-semibold transition-colors ${
+                        item.active
+                          ? 'bg-slate-100 text-[#ff1d00]'
+                          : 'text-slate-700 hover:bg-slate-50 hover:text-slate-900'
+                      }`}
+                    >
+                      {item.label}
+                    </a>
+
+                    {/* Mobile Submenu Items */}
+                    {item.children && (
+                      <div className="pl-4 flex flex-col gap-1 my-1">
+                        {item.children.map((child, childIdx) => (
+                          <a
+                            key={childIdx}
+                            href={child.href}
+                            onClick={() => setMobileMenuOpen(false)}
+                            className="px-4 py-2 rounded-xl text-sm font-medium text-slate-600 hover:text-[#ff1d00] hover:bg-slate-50 transition-colors"
+                          >
+                            {child.label}
+                          </a>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 ))}
               </div>
 

@@ -1,5 +1,5 @@
 import { ArrowRight, Send, Hexagon, Sparkles, Cpu, Layers } from 'lucide-react';
-
+import optimic from '../../../assets/optimic.png';
 export default function Footer() {
   return (
     <footer className="relative bg-gradient-to-b from-[#ff3c00] to-[#e01a00]
@@ -40,7 +40,7 @@ export default function Footer() {
 
           {/* Center Prominent Icon */}
           <div className="p-4 bg-white rounded-2xl shadow-[0_0_40px_rgba(255,255,255,0.2)] z-20 mx-2 -translate-y-2">
-            <Send className="w-7 h-7 text-[#ff1d00] fill-[#ff1d00]" />
+            <img src={optimic} className='w-10 h-10' alt="" />
           </div>
 
           <div className="p-2.5 bg-white/10 rounded-full backdrop-blur-md border border-white/20 translate-y-3">

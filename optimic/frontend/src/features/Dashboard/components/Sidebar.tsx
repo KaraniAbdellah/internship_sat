@@ -7,23 +7,8 @@ interface SidebarProps {
   onNotify: (msg: string) => void;
 }
 
-const USER_SESSIONS = [
-  'Formulaire chauffeur Maroc',
-  'Frontend Dossier Logic Update',
-  'White Gradient Button',
-  'Button Color Update',
-  'React Router Setup',
-  'Development Best Practices',
-  'Correction grammaire CV',
-];
 
 export default function Sidebar({ isOpen, onToggle, onNotify }: SidebarProps) {
-  const [activeSession, setActiveSession] = useState<string | null>(null);
-
-  const handleSelectSession = (name: string) => {
-    setActiveSession(name);
-    onNotify(`Session "${name}" selected`);
-  };
 
   const handleExcelImport = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
