@@ -6,7 +6,9 @@
 - use "Playpen Sans Arabic", cursive
 
 ## Don't
-- do not hard code
+- Do not hard code
+- do not return big filies. (300)
+
 
 ## Project Structure
 - use feature based structure.
@@ -18,4 +20,13 @@
 ## Good and Bad examples
 - make the components like `Admin.tsx`
 - do not make the like `Project.tsx`
+- Lazy Loading
+Code Splitting
+Memoization
+Error Boundaries
+Keep code easy and easy to read. and update.
 
+## Engineering Best Practices
+Single Responsibility
+DRY
+Clean code and simple code (any one can read it.)
