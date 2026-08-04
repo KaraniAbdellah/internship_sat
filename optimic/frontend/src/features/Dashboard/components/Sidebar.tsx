@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { SquarePen, FileSpreadsheet, PanelLeftClose, PanelLeft } from 'lucide-react';
 
 interface SidebarProps {

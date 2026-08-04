@@ -1,6 +1,5 @@
-import React from 'react';
 import { motion } from 'framer-motion';
-import { Send, Bot, TrendingUp, Sparkles } from 'lucide-react';
+import { Bot, TrendingUp, Sparkles } from 'lucide-react';
 import woman_promotion from "../../../assets/woman_promotion.png";
 
 const fadeInUp = {

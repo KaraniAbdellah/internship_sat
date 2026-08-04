@@ -1,6 +1,6 @@
-import { useState, KeyboardEvent } from 'react';
+import { useState } from 'react';
 import { ArrowUp } from 'lucide-react';
-
+import type { KeyboardEvent } from 'react';
 interface ContentProps {
   onNotify: (msg: string) => void;
 }
