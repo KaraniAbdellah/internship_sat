@@ -3,13 +3,7 @@
 ## Do
 - use react.js and tailwind cdn.
 - use in animation Framer Motion react. no hard coding.
-- use 
-.playpen-sans-arabic-<uniquifier> {
-  font-family: "Playpen Sans Arabic", cursive;
-  font-optical-sizing: auto;
-  font-weight: 700;
-  font-style: normal;
-}
+- use "Playpen Sans Arabic", cursive
 
 ## Don't
 - do not hard code
