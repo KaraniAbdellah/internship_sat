@@ -44,8 +44,9 @@ export default function Header() {
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
+      setIsScrolled(window.scrollY > 50);
     };
+    
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
@@ -55,15 +56,28 @@ export default function Header() {
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: 'easeOut' }}
-      className={`sticky top-0 inset-x-0 z-50 transition-all duration-300 ${
-        isScrolled
-          ? 'bg-white/85 backdrop-blur-md border-b border-slate-200/80 shadow-xs py-3.5'
-          : 'bg-transparent py-5'
-      }`}
+      className="sticky top-0 inset-x-0 z-50 p-2 sm:px-6 bg-gradient-to-b from-white via-orange-50/50 to-red-50/30"
     >
-      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between">
-        {/* Brand Logo */}
-        <a href="#" className="flex items-center gap-2 sm:gap-2.5 group">
+      {/* Dynamic Floating Container based on Scroll */}
+      <motion.div
+        animate={{
+          maxWidth: isScrolled ? '1000px' : '1280px',
+          backgroundColor: isScrolled ? 'rgba(255, 255, 255, 0.9)' : 'rgba(255, 255, 255, 0)',
+          boxShadow: isScrolled
+            ? '0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.08)'
+            : '0 0px 0px 0px rgba(0,0,0,0)',
+          borderRadius: isScrolled ? '9999px' : '0px',
+          paddingLeft: isScrolled ? '1rem' : '1rem',
+          paddingRight: isScrolled ? '1rem' : '1rem',
+          paddingTop: isScrolled ? '0.75rem' : '1rem',
+          paddingBottom: isScrolled ? '0.75rem' : '1rem',
+          borderWidth: isScrolled ? '1px' : '0px',
+        }}
+        transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+        className="flex items-center justify-between mx-auto backdrop-blur-xl border-slate-200/80 transition-colors"
+      >
+        {/* Left Section - Brand Logo */}
+        <a href="/" className="flex items-center gap-2 sm:gap-2.5 group flex-shrink-0">
           <img
             src={image}
             alt="Optimic Logo"
@@ -74,11 +88,11 @@ export default function Header() {
           </span>
         </a>
 
-        {/* Floating Desktop Navigation */}
-        <nav className="hidden md:flex items-center gap-1 bg-slate-100/90 backdrop-blur-md px-3 py-1.5 rounded-full border border-slate-200/80 shadow-xs">
-          {NAV_ITEMS.map((item, index) => (
+        {/* Center Section - Floating Desktop Navigation */}
+        <nav className="hidden md:flex items-center gap-1 bg-slate-100/80 backdrop-blur-md px-3 py-1.5 rounded-full border border-slate-200/60 shadow-xs mx-auto">
+          {NAV_ITEMS.map((item) => (
             <div
-              key={index}
+              key={item.label}
               className="relative"
               onMouseEnter={() => item.children && setActiveDropdown(item.label)}
               onMouseLeave={() => setActiveDropdown(null)}
@@ -114,9 +128,9 @@ export default function Header() {
                     className="absolute top-full left-0 pt-2 w-48 z-50"
                   >
                     <div className="bg-white/95 backdrop-blur-md rounded-2xl shadow-xl border border-slate-100 py-2 overflow-hidden">
-                      {item.children.map((child, childIdx) => (
+                      {item.children.map((child) => (
                         <a
-                          key={childIdx}
+                          key={child.href}
                           href={child.href}
                           className="block px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 hover:text-[#ff1d00] transition-colors"
                         >
@@ -138,7 +152,10 @@ export default function Header() {
             onMouseEnter={() => setIsLangOpen(true)}
             onMouseLeave={() => setIsLangOpen(false)}
           >
-            <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium text-slate-700 hover:text-slate-900 hover:bg-slate-200/50 transition-all cursor-pointer">
+            <button
+              aria-label="Change language"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium text-slate-700 hover:text-slate-900 hover:bg-slate-200/50 transition-all cursor-pointer"
+            >
               <Globe className="w-4 h-4 text-slate-500" />
               <span>{selectedLang.code.toUpperCase()}</span>
               <ChevronDown
@@ -165,6 +182,7 @@ export default function Header() {
                           setSelectedLang(lang);
                           setIsLangOpen(false);
                         }}
+                        aria-label={`Select ${lang.label}`}
                         className={`w-full flex items-center justify-between px-4 py-2 text-sm font-medium transition-colors cursor-pointer ${
                           selectedLang.code === lang.code
                             ? 'font-semibold text-[#ff1d00] bg-orange-50/50'
@@ -182,42 +200,43 @@ export default function Header() {
           </div>
         </nav>
 
-        {/* Desktop CTA */}
-        <div className="hidden md:flex items-center">
+        {/* Right Section - CTA and Mobile Menu */}
+        <div className="flex items-center gap-3 flex-shrink-0">
+          {/* Desktop CTA */}
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            className="bg-slate-900 text-white text-sm font-bold px-6 py-2.5 rounded-full hover:bg-slate-800 transition-colors shadow-xs cursor-pointer"
+            className="hidden md:block bg-[#ff1d00] text-white text-sm font-bold px-6 py-2.5 rounded-full hover:bg-[#e01900] transition-colors shadow-xs cursor-pointer"
           >
             Login / Register
           </motion.button>
-        </div>
 
-        {/* Mobile Phone Menu Toggle */}
-        <button
-          onClick={() => setMobileMenuOpen((prev) => !prev)}
-          aria-label="Toggle Phone Navigation"
-          className="md:hidden p-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-800 focus:outline-none transition-colors cursor-pointer"
-        >
-          {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-        </button>
-      </div>
+          {/* Mobile Menu Toggle */}
+          <button
+            onClick={() => setMobileMenuOpen((prev) => !prev)}
+            aria-label="Toggle navigation menu"
+            className="md:hidden p-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-800 focus:outline-none transition-colors cursor-pointer"
+          >
+            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
+        </div>
+      </motion.div>
 
       {/* Mobile Drawer Overlay */}
       <AnimatePresence>
         {mobileMenuOpen && (
           <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
+            initial={{ opacity: 0, marginTop: 0 }}
+            animate={{ opacity: 1, marginTop: 12 }}
+            exit={{ opacity: 0, marginTop: 0 }}
             transition={{ duration: 0.25, ease: 'easeInOut' }}
-            className="md:hidden overflow-hidden px-4 sm:px-6 pt-3"
+            className="md:hidden"
           >
             <div className="bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-slate-200/80 p-5 flex flex-col gap-4">
-              {/* Phone Navigation Links */}
+              {/* Mobile Navigation Links */}
               <div className="flex flex-col gap-1">
-                {NAV_ITEMS.map((item, index) => (
-                  <div key={index} className="flex flex-col">
+                {NAV_ITEMS.map((item) => (
+                  <div key={item.label} className="flex flex-col">
                     <a
                       href={item.href}
                       onClick={() => setMobileMenuOpen(false)}
@@ -233,9 +252,9 @@ export default function Header() {
                     {/* Mobile Submenu Items */}
                     {item.children && (
                       <div className="pl-4 flex flex-col gap-1 my-1">
-                        {item.children.map((child, childIdx) => (
+                        {item.children.map((child) => (
                           <a
-                            key={childIdx}
+                            key={child.href}
                             href={child.href}
                             onClick={() => setMobileMenuOpen(false)}
                             className="px-4 py-2 rounded-xl text-sm font-medium text-slate-600 hover:text-[#ff1d00] hover:bg-slate-50 transition-colors"
@@ -259,6 +278,7 @@ export default function Header() {
                     <button
                       key={lang.code}
                       onClick={() => setSelectedLang(lang)}
+                      aria-label={`Select ${lang.label}`}
                       className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
                         selectedLang.code === lang.code
                           ? 'bg-[#ff1d00] text-white shadow-xs'
@@ -272,7 +292,7 @@ export default function Header() {
               </div>
 
               {/* Mobile CTA */}
-              <button className="w-full bg-slate-900 text-white text-sm font-bold py-3.5 rounded-2xl shadow-md active:scale-[0.98] transition-transform">
+              <button className="w-full bg-[#ff1d00] text-white text-sm font-bold py-3.5 rounded-2xl shadow-md active:scale-[0.98] transition-transform">
                 Login / Register
               </button>
             </div>
