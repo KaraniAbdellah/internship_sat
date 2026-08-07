@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Marketing Offer Platform</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: #f5f5f5;
+      color: #1a1a1a;
+    }
+
+    .container {
+      display: flex;
+      height: 100vh;
+      background: #fafafa;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 240px;
+      background: #fff;
+      border-right: 1px solid #e0e0e0;
+      padding: 1rem;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .sidebar-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: #999;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 1rem;
+    }
+
+    .sessions-list {
+      flex: 1;
+      margin-bottom: 1rem;
+    }
+
+    .session-item {
+      padding: 10px 12px;
+      margin-bottom: 6px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      background: transparent;
+      border: 1px solid transparent;
+      transition: all 0.2s;
+    }
+
+    .session-item:hover {
+      background: #f5f5f5;
+    }
+
+    .session-item.active {
+      background: #e3f2fd;
+      border-color: #2196f3;
+    }
+
+    .session-meta {
+      font-size: 11px;
+      color: #999;
+      margin-top: 3px;
+    }
+
+    .btn-new-session {
+      width: 100%;
+      padding: 10px 12px;
+      background: #2196f3;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      transition: background 0.2s;
+    }
+
+    .btn-new-session:hover {
+      background: #1976d2;
+    }
+
+    /* Main Content */
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .header {
+      background: #fff;
+      border-bottom: 1px solid #e0e0e0;
+      padding: 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .header-title h1 {
+      font-size: 20px;
+      margin: 0 0 4px;
+      font-weight: 500;
+    }
+
+    .header-title p {
+      font-size: 12px;
+      color: #999;
+      margin: 0;
+    }
+
+    .session-name-input {
+      width: 200px;
+      padding: 6px 8px;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      font-size: 13px;
+      font-family: inherit;
+    }
+
+    .tabs {
+      display: flex;
+      background: #fff;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 12px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      color: #999;
+      position: relative;
+      transition: color 0.2s;
+    }
+
+    .tab-btn:hover {
+      color: #666;
+    }
+
+    .tab-btn.active {
+      color: #1a1a1a;
+    }
+
+    .tab-btn.active::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: #2196f3;
+    }
+
+    .content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.5rem;
+    }
+
+    .tab-pane {
+      display: none;
+    }
+
+    .tab-pane.active {
+      display: block;
+    }
+
+    /* Data Tab */
+    .upload-area {
+      border: 2px dashed #ddd;
+      border-radius: 8px;
+      padding: 2rem;
+      text-align: center;
+      background: #fafafa;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .upload-area:hover {
+      border-color: #2196f3;
+      background: #e3f2fd;
+    }
+
+    .upload-area.dragover {
+      border-color: #2196f3;
+      background: #e3f2fd;
+    }
+
+    .upload-area p {
+      color: #999;
+      margin-bottom: 1rem;
+      font-size: 14px;
+    }
+
+    .btn-upload {
+      display: inline-block;
+      padding: 10px 20px;
+      background: #2196f3;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      transition: background 0.2s;
+    }
+
+    .btn-upload:hover {
+      background: #1976d2;
+    }
+
+    .data-preview {
+      background: #fff;
+      border-radius: 8px;
+      border: 1px solid #e0e0e0;
+      padding: 1rem;
+      margin-top: 1rem;
+    }
+
+    .data-preview-header {
+      font-size: 13px;
+      color: #999;
+      margin-bottom: 1rem;
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+
+    .data-table thead tr {
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .data-table th {
+      padding: 8px;
+      text-align: left;
+      font-weight: 600;
+      color: #999;
+    }
+
+    .data-table td {
+      padding: 8px;
+      color: #666;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .btn-remove {
+      margin-top: 1rem;
+      padding: 6px 12px;
+      background: transparent;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+
+    .btn-remove:hover {
+      background: #f5f5f5;
+    }
+
+    /* Policies Tab */
+    .policy-grid {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .policy-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 12px;
+      background: #fff;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+    }
+
+    .policy-item label {
+      flex: 1;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .policy-item input[type="number"],
+    .policy-item input[type="checkbox"] {
+      font-family: inherit;
+      font-size: 14px;
+      padding: 6px 8px;
+    }
+
+    .policy-item input[type="number"] {
+      width: 150px;
+      border: 1px solid #e0e0e0;
+      border-radius: 4px;
+    }
+
+    .policy-item input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+    }
+
+    /* Chat Tab */
+    .chat-container {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    .messages {
+      flex: 1;
+      overflow-y: auto;
+      margin-bottom: 1rem;
+    }
+
+    .message {
+      margin-bottom: 1rem;
+      display: flex;
+      gap: 12px;
+    }
+
+    .message.user {
+      flex-direction: row-reverse;
+    }
+
+    .message-bubble {
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      max-width: 65%;
+      line-height: 1.5;
+    }
+
+    .message.user .message-bubble {
+      background: #2196f3;
+      color: white;
+    }
+
+    .message.agent .message-bubble {
+      background: #f5f5f5;
+      color: #1a1a1a;
+    }
+
+    .message-time {
+      font-size: 11px;
+      opacity: 0.7;
+      margin-top: 4px;
+    }
+
+    .message-agent-name {
+      font-weight: 600;
+      margin-bottom: 4px;
+      font-size: 12px;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: #999;
+    }
+
+    .empty-state p {
+      margin-bottom: 0.5rem;
+      font-size: 16px;
+    }
+
+    .empty-state .empty-subtitle {
+      font-size: 13px;
+    }
+
+    .loading-dots {
+      display: flex;
+      gap: 6px;
+      padding: 12px 14px;
+      width: fit-content;
+      font-size: 20px;
+      color: #2196f3;
+    }
+
+    .loading-dot {
+      animation: blink 1s infinite;
+    }
+
+    .loading-dot:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .loading-dot:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    .chat-input-form {
+      display: flex;
+      gap: 8px;
+    }
+
+    .chat-input-form input {
+      flex: 1;
+      padding: 10px 12px;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      font-size: 14px;
+      font-family: inherit;
+    }
+
+    .chat-input-form input:focus {
+      outline: none;
+      border-color: #2196f3;
+      box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.1);
+    }
+
+    .chat-input-form input:disabled {
+      background: #f5f5f5;
+      color: #999;
+      cursor: not-allowed;
+    }
+
+    .btn-send {
+      padding: 10px 20px;
+      background: #2196f3;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      transition: background 0.2s;
+    }
+
+    .btn-send:hover {
+      background: #1976d2;
+    }
+
+    .btn-send:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+
+    h3 {
+      font-size: 16px;
+      font-weight: 500;
+      margin-bottom: 1rem;
+    }
+
+    #file-input {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="sidebar-title">Sessions</div>
+      <div class="sessions-list" id="sessionsList"></div>
+      <button class="btn-new-session" onclick="createNewSession()">+ New Session</button>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main">
+      <!-- Header -->
+      <div class="header">
+        <div class="header-title">
+          <h1 id="sessionTitle">Session 1</h1>
+          <p id="sessionDate">Created: Just now</p>
+        </div>
+        <input type="text" class="session-name-input" id="sessionNameInput" placeholder="Session name" onchange="updateSessionName(this.value)">
+      </div>
+
+      <!-- Tabs -->
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('data')">📁 Data</button>
+        <button class="tab-btn" onclick="switchTab('policies')">⚙️ Policies</button>
+        <button class="tab-btn" onclick="switchTab('chat')">💬 Chat</button>
+      </div>
+
+      <!-- Content -->
+      <div class="content">
+        <!-- Data Tab -->
+        <div id="data-tab" class="tab-pane active">
+          <h3>Data Management</h3>
+          <div id="uploadArea" class="upload-area" ondrop="handleDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
+            <p>Upload a CSV file to provide customer data</p>
+            <input type="file" id="file-input" accept=".csv,.xlsx" onchange="handleFileUpload(event)">
+            <label for="file-input" class="btn-upload">📤 Upload CSV</label>
+          </div>
+          <div id="dataPreview"></div>
+        </div>
+
+        <!-- Policies Tab -->
+        <div id="policies-tab" class="tab-pane">
+          <h3>Offer Policies</h3>
+          <div class="policy-grid" id="policiesGrid"></div>
+        </div>
+
+        <!-- Chat Tab -->
+        <div id="chat-tab" class="tab-pane">
+          <div class="chat-container">
+            <div class="messages" id="messagesList"></div>
+            <form class="chat-input-form" onsubmit="sendMessage(event)">
+              <input type="text" id="messageInput" placeholder="Ask the agents about your offer..." disabled>
+              <button type="submit" class="btn-send" id="sendBtn" disabled>Send</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Data structures
+    let allSessions = JSON.parse(localStorage.getItem('sessions')) || [
+      { id: 1, name: 'Session 1', created: new Date().toLocaleString(), data: null, policies: {}, messages: [] }
+    ];
+    let currentSessionId = 1;
+
+    const policyConfig = [
+      { key: 'discount', label: 'Max Discount %', type: 'number' },
+      { key: 'minOrder', label: 'Min Order Value ($)', type: 'number' },
+      { key: 'maxPerCustomer', label: 'Max Uses Per Customer', type: 'number' },
+      { key: 'compliance', label: 'GDPR Compliance', type: 'checkbox' },
+      { key: 'duration', label: 'Offer Duration (days)', type: 'number' },
+    ];
+
+    // Helper functions
+    function getCurrentSession() {
+      return allSessions.find(s => s.id === currentSessionId);
+    }
+
+    function saveSessions() {
+      localStorage.setItem('sessions', JSON.stringify(allSessions));
+    }
+
+    function updateSessionName(name) {
+      const session = getCurrentSession();
+      if (session) {
+        session.name = name;
+        saveSessions();
+        renderSessionsList();
+      }
+    }
+
+    function updateSession(updates) {
+      const session = getCurrentSession();
+      if (session) {
+        Object.assign(session, updates);
+        saveSessions();
+      }
+    }
+
+    function switchTab(tab) {
+      document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById(tab + '-tab').classList.add('active');
+      event.target.classList.add('active');
+    }
+
+    function createNewSession() {
+      const newId = Math.max(...allSessions.map(s => s.id), 0) + 1;
+      const newSession = {
+        id: newId,
+        name: `Session ${newId}`,
+        created: new Date().toLocaleString(),
+        data: null,
+        policies: {},
+        messages: []
+      };
+      allSessions.push(newSession);
+      currentSessionId = newId;
+      saveSessions();
+      renderSessionsList();
+      renderSessionHeader();
+      clearContent();
+    }
+
+    function selectSession(id) {
+      currentSessionId = id;
+      saveSessions();
+      renderSessionsList();
+      renderSessionHeader();
+      renderPolicies();
+      renderChat();
+    }
+
+    function renderSessionsList() {
+      const list = document.getElementById('sessionsList');
+      list.innerHTML = allSessions.map(s => `
+        <div class="session-item ${s.id === currentSessionId ? 'active' : ''}" onclick="selectSession(${s.id})">
+          ${s.name}
+          <div class="session-meta">${s.messages.length} messages</div>
+        </div>
+      `).join('');
+    }
+
+    function renderSessionHeader() {
+      const session = getCurrentSession();
+      document.getElementById('sessionTitle').textContent = session.name;
+      document.getElementById('sessionDate').textContent = `Created: ${session.created}`;
+      document.getElementById('sessionNameInput').value = session.name;
+    }
+
+    function clearContent() {
+      document.getElementById('dataPreview').innerHTML = '';
+      renderPolicies();
+      renderChat();
+    }
+
+    // Data Tab
+    function handleDragOver(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      document.getElementById('uploadArea').classList.add('dragover');
+    }
+
+    function handleDragLeave(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      document.getElementById('uploadArea').classList.remove('dragover');
+    }
+
+    function handleDrop(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      document.getElementById('uploadArea').classList.remove('dragover');
+      const files = e.dataTransfer.files;
+      if (files.length > 0) {
+        handleFileInput(files[0]);
+      }
+    }
+
+    function handleFileUpload(e) {
+      if (e.target.files.length > 0) {
+        handleFileInput(e.target.files[0]);
+      }
+    }
+
+    function handleFileInput(file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const text = e.target.result;
+        const lines = text.split('\n');
+        const headers = lines[0].split(',').map(h => h.trim());
+        const rows = lines.slice(1).filter(line => line.trim()).map(line => {
+          const values = line.split(',').map(v => v.trim());
+          return headers.reduce((obj, header, i) => {
+            obj[header] = values[i];
+            return obj;
+          }, {});
+        });
+
+        updateSession({
+          data: { type: 'csv', headers, rows, filename: file.name }
+        });
+
+        renderDataPreview();
+        renderChat();
+      };
+      reader.readAsText(file);
+    }
+
+    function renderDataPreview() {
+      const session = getCurrentSession();
+      const preview = document.getElementById('dataPreview');
+
+      if (!session.data) {
+        preview.innerHTML = '';
+        return;
+      }
+
+      const tableHTML = `
+        <div class="data-preview">
+          <div class="data-preview-header">📄 ${session.data.filename} • ${session.data.rows.length} rows</div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                ${session.data.headers.map(h => `<th>${h}</th>`).join('')}
+              </tr>
+            </thead>
+            <tbody>
+              ${session.data.rows.slice(0, 5).map(row => `
+                <tr>
+                  ${session.data.headers.map(h => `<td>${row[h]}</td>`).join('')}
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+          <button class="btn-remove" onclick="removeData()">Remove</button>
+        </div>
+      `;
+      preview.innerHTML = tableHTML;
+    }
+
+    function removeData() {
+      updateSession({ data: null });
+      document.getElementById('dataPreview').innerHTML = '';
+      renderChat();
+    }
+
+    // Policies Tab
+    function renderPolicies() {
+      const session = getCurrentSession();
+      const grid = document.getElementById('policiesGrid');
+
+      grid.innerHTML = policyConfig.map(policy => {
+        const value = session.policies[policy.key] || '';
+        return `
+          <div class="policy-item">
+            <label>${policy.label}</label>
+            ${policy.type === 'checkbox' ? `
+              <input type="checkbox" ${value ? 'checked' : ''} onchange="updatePolicy('${policy.key}', this.checked)">
+            ` : `
+              <input type="${policy.type}" value="${value}" onchange="updatePolicy('${policy.key}', this.value)">
+            `}
+          </div>
+        `;
+      }).join('');
+    }
+
+    function updatePolicy(key, value) {
+      const session = getCurrentSession();
+      session.policies[key] = value;
+      saveSessions();
+    }
+
+    // Chat Tab
+    function renderChat() {
+      const session = getCurrentSession();
+      const messagesList = document.getElementById('messagesList');
+      const input = document.getElementById('messageInput');
+      const sendBtn = document.getElementById('sendBtn');
+
+      const canChat = session.data !== null;
+      input.disabled = !canChat;
+      sendBtn.disabled = !canChat;
+
+      if (session.messages.length === 0) {
+        if (canChat) {
+          messagesList.innerHTML = '';
+        } else {
+          messagesList.innerHTML = `
+            <div class="empty-state">
+              <p>No messages yet</p>
+              <p class="empty-subtitle">Start by uploading data and setting policies, then ask a question</p>
+            </div>
+          `;
+        }
+      } else {
+        messagesList.innerHTML = session.messages.map(msg => `
+          <div class="message ${msg.type}">
+            <div class="message-bubble">
+              ${msg.type === 'agent' ? `<div class="message-agent-name">${msg.emoji} ${msg.agent}</div>` : ''}
+              <div>${msg.content}</div>
+              <div class="message-time">${msg.timestamp}</div>
+            </div>
+          </div>
+        `).join('');
+        messagesList.scrollTop = messagesList.scrollHeight;
+      }
+    }
+
+    function sendMessage(e) {
+      e.preventDefault();
+      const input = document.getElementById('messageInput');
+      const message = input.value.trim();
+      if (!message) return;
+
+      const session = getCurrentSession();
+      session.messages.push({
+        id: Date.now(),
+        type: 'user',
+        content: message,
+        timestamp: new Date().toLocaleTimeString()
+      });
+      input.value = '';
+      renderChat();
+
+      // Show loading
+      document.getElementById('sendBtn').disabled = true;
+      input.disabled = true;
+
+      // Simulate agent responses
+      setTimeout(() => {
+        generateAgentResponse(message);
+      }, 800);
+    }
+
+    function generateAgentResponse(userMessage) {
+      const agents = [
+        {
+          name: 'Scoring Agent',
+          emoji: '📊',
+          response: `Analyzed customer data: Found ${getCurrentSession().data?.rows?.length || 10} records. Score distribution: High-value (${Math.floor(Math.random() * 40 + 10)}%), Medium-value (${Math.floor(Math.random() * 40 + 30)}%), Low-value (${Math.floor(Math.random() * 40 + 20)}%).`
+        },
+        {
+          name: 'Generation Agent',
+          emoji: '✨',
+          response: `Generated 3 marketing offer variations based on policies. Offer A: "${getCurrentSession().policies.discount || 10}% off" strategy. Offer B: "Bundle deal" approach. Offer C: "Loyalty reward" model.`
+        },
+        {
+          name: 'Validation Agent',
+          emoji: '✅',
+          response: `Validated offers against policies. Compliance: ${getCurrentSession().policies.compliance ? 'GDPR compliant' : 'Basic validation'}. Brand alignment: ✓ All offers match brand guidelines.`
+        },
+        {
+          name: 'Optimization Agent',
+          emoji: '🚀',
+          response: `Optimized for conversion. Recommended Offer A with ${Math.floor(Math.random() * 5 + 15)}% expected CTR improvement. A/B test suggestion: Test timing on ${['Monday', 'Wednesday', 'Friday'][Math.floor(Math.random() * 3)]}.`
+        }
+      ];
+
+      const session = getCurrentSession();
+      const randomAgent = agents[Math.floor(Math.random() * agents.length)];
+
+      session.messages.push({
+        id: Date.now(),
+        type: 'agent',
+        agent: randomAgent.name,
+        emoji: randomAgent.emoji,
+        content: randomAgent.response,
+        timestamp: new Date().toLocaleTimeString()
+      });
+
+      saveSessions();
+      renderChat();
+
+      document.getElementById('sendBtn').disabled = false;
+      document.getElementById('messageInput').disabled = false;
+      document.getElementById('messageInput').focus();
+    }
+
+    // Initialize
+    window.addEventListener('load', () => {
+      renderSessionsList();
+      renderSessionHeader();
+      renderPolicies();
+      renderDataPreview();
+      renderChat();
+    });
+  </script>
+</body>
+</html>
