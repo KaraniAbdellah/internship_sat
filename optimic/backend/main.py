@@ -35,6 +35,8 @@ SCORING_PROMPT = f.read()
 f = open("./prompts/validation.md")
 VALIDATION_PROMPT = f.read()
 
+
+
 # State Definition
 class MarketingState(TypedDict):
     offre_rules: str
@@ -45,18 +47,19 @@ class MarketingState(TypedDict):
     optimized_offre: str
     next: Literal["SCORING", "GENERATION", "VALIDATION", "OPTIMISATION", "END"]
 
+
 # Start Point
 app = FastAPI()
 
 
+
 @app.get("/")
 def hello_world():
-    return {"message": "Hello, Optimicien!"}
+    return {"message": "Hello, World!"}
 
-
-# DATA = Customer Data + Polcies
+# DATA = Offre + Policies
 @app.post("/generate")
-def generate(): 
+def generate():
     customer_data = ""
     offre_rules = ""
     pass
@@ -66,3 +69,4 @@ def generate():
 @app.post("/feedback")
 def feedback():
     pass
+
