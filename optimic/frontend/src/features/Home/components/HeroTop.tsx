@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Star, Globe, ArrowRight } from "lucide-react";
+import { Globe, ArrowRight } from "lucide-react";
 
 const PRIMARY = "#ff1d00";
 
