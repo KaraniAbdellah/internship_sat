@@ -57,7 +57,7 @@ export default function Footer() {
         </h2>
 
         <button className="inline-flex items-center gap-2 px-6 py-3.5 bg-white text-[#ff1d00] text-sm font-bold rounded-lg hover:bg-slate-50 hover:scale-105 transition-all duration-200 shadow-xl shadow-white/10">
-          Check AI visibility <ArrowRight className="w-4 h-4" />
+          Check YOUR Visibility For FREE <ArrowRight className="w-4 h-4" />
         </button>
 
         {/* Footer Links Grid */}
@@ -77,18 +77,17 @@ export default function Footer() {
           {/* Quick Links Column */}
           <div className="md:col-span-3 flex flex-col gap-3.5">
             <h4 className="text-white font-semibold mb-1">Quick Links</h4>
-            <a href="#" className="hover:text-white transition-colors">Pricing</a>
-            <a href="#" className="hover:text-white transition-colors">FAQ</a>
-            <a href="#" className="hover:text-white transition-colors">Sign In</a>
+            <a href="#agents" className="hover:text-white transition-colors">Agents</a>
+            <a href="#pricing" className="hover:text-white transition-colors">Pricing</a>
+            <a href="#faq" className="hover:text-white transition-colors">FAQ</a>
           </div>
 
           {/* Company Column */}
           <div className="md:col-span-3 flex flex-col gap-3.5">
             <h4 className="text-white font-semibold mb-1">Company</h4>
+            <a href="/terms-of-service" className="hover:text-white transition-colors">Terms of Service</a>
             <a href="#" className="hover:text-white transition-colors">Twitter / X</a>
-            <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
-            <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
-            <a href="#" className="hover:text-white transition-colors">Imprint</a>
+            <a href="#" className="hover:text-white transition-colors">Linkedin</a>
           </div>
         </div>
       </div>

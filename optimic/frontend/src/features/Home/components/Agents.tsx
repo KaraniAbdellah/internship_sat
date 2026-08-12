@@ -35,9 +35,9 @@ const agents = [
   },
 ];
 
-export default function Solution() {
+export default function Agents() {
   return (
-    <section id='solution' className="py-16 px-4 max-w-7xl mx-auto text-center">
+    <section id='agents' className="py-16 px-4 max-w-7xl mx-auto text-center">
       <div className="mb-12">
         <span className="text-[#ff1d00] text-xs font-bold tracking-widest uppercase bg-[#ff1d00]/10 px-3 py-1 rounded-full border border-[#ff1d00]/20">
           Multi-Agent System

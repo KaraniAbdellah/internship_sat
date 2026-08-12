@@ -12,7 +12,7 @@ export default function FAQ() {
   };
 
   return (
-    <section className="w-full bg-white py-20 px-6 sm:px-12 font-sans border-t border-slate-100">
+    <section id="faq" className="w-full bg-white py-20 px-6 sm:px-12 font-sans border-t border-slate-100">
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
 
         {/* Left Headline */}
