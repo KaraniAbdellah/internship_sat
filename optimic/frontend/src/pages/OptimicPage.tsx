@@ -1,8 +1,8 @@
-import Dashboard from '../features/Dashboard/components/Dashbaord';
+import Optimic from '@/features/Dashboard/components/Optimic';
 const OptimicPage = () => {
   return (
     <div>
-      <Dashboard />
+      <Optimic />
     </div>
   );
 };
