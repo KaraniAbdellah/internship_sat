@@ -1,4 +1,3 @@
-import React from 'react';
 import { Sparkles, BarChart3, GitCommit, Cpu, RefreshCw } from 'lucide-react';
 
 const AGENTS = [

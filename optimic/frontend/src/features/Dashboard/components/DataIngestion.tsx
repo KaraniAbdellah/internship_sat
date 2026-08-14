@@ -1,4 +1,3 @@
-import React from 'react';
 import { UploadCloud, FileSpreadsheet, CheckCircle2 } from 'lucide-react';
 
 export default function DataIngestion() {
