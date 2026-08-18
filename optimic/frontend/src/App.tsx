@@ -1,5 +1,6 @@
-// App.tsx
+import { useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Toaster } from "react-hot-toast";
 
 // Pages
 import AuthPage from "./pages/AuthPage";
@@ -7,22 +8,47 @@ import HomePage from "./pages/HomePage";
 import OptimicPage from "./pages/OptimicPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import Terms_of_ServicePage from "./pages/Terms_of_Service";
-import { useState } from "react";
 
-import { FileContext } from "./global/context/FileContext";
+// Contexts & Types
+import { DatasetContext } from "./global/context/DatasetContext";
 import { CustomerDataContext } from "./global/context/CustomerDataContext";
-import { FileType } from "./global/types/FileType";
+import { DatasetType } from "./global/types/DatasetType";
 import { CustomerDataType } from "./global/types/CustomerDataType";
 
 function App() {
-  const [file, setFile] = useState<FileType | null>(null);
-  const [customerData, setCustomerData] = useState<CustomerDataType | null>(
-    null,
-  );
+  const [datasets, setDatasets] = useState<DatasetType[]>([]);
+  const [activeDataset, setActiveDataset] = useState<DatasetType | null>(null);
+  const [customerData, setCustomerData] = useState<CustomerDataType[] | null>([]);
+
   return (
     <BrowserRouter>
-      <FileContext.Provider value={{ file, setFile }}>
+      <DatasetContext.Provider
+        value={{ datasets, setDatasets, activeDataset, setActiveDataset }}
+      >
         <CustomerDataContext.Provider value={{ customerData, setCustomerData }}>
+          {/* Global Toast Notifications */}
+          <Toaster
+            position="top-right"
+            toastOptions={{
+              duration: 4000,
+              style: {
+                background: "#334155",
+                color: "#fff",
+                fontSize: "14px",
+              },
+              success: {
+                style: {
+                  background: "#059669",
+                },
+              },
+              error: {
+                style: {
+                  background: "#e11d48",
+                },
+              },
+            }}
+          />
+
           <Routes>
             <Route path="optimic" element={<OptimicPage />} />
             <Route path="/" element={<HomePage />} />
@@ -31,7 +57,7 @@ function App() {
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </CustomerDataContext.Provider>
-      </FileContext.Provider>
+      </DatasetContext.Provider>
     </BrowserRouter>
   );
 }

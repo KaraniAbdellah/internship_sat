@@ -3,14 +3,12 @@ import Sidebar from './Sidebar';
 import { NAV_ITEMS } from '../constants/conts';
 
 // 1. Import your page components
-import Dashboard from './Dashboard';
-import DataLoader from './DataLoader';
+import OptimicStudio from './OptimicStudio';
 import SettingsView from './Settings';
 
 // 2. Component Lookup Map (id -> Component)
 const VIEWS: Record<string, React.ComponentType> = {
-  'dashboard': Dashboard,
-  'data-upload': DataLoader,
+  'dashboard': OptimicStudio,
   'settings': SettingsView,
 };
 

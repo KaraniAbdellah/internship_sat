@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { NAV_ITEMS } from '../constants/conts';
-import image from "@/assets/optimic.png";
+import persona_icon from "@/assets/persona_icon.png";
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface SidebarProps {
@@ -26,9 +26,9 @@ export default function Sidebar({ activeId, onSelect }: SidebarProps) {
         {/* Logo & Brand Name */}
         <div className="flex items-center gap-2.5 overflow-hidden">
           <img
-            src={image}
+            src={persona_icon}
             alt="Optimic Logo"
-            className="w-7 h-7 object-contain shrink-0"
+            className="w-12 h-12 object-contain shrink-0"
           />
           {!isCollapsed && (
             <span className="text-xl font-bold text-slate-900 tracking-tight whitespace-nowrap">

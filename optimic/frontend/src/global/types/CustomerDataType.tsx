@@ -1,4 +1,4 @@
 export type CustomerDataType = {
-    id: number;
-    name: string;
+  id: number;
+  content: string;
 };

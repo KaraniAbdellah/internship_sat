@@ -1,15 +1,25 @@
-import { 
-  LayoutGrid, 
-  CloudUpload, 
-  TrendingUp, 
-  Megaphone, 
-  Settings 
-} from 'lucide-react';
+import { TrendingUp, Megaphone, Settings, WandSparkles } from "lucide-react";
 
 export const NAV_ITEMS = [
-  { id: 'dashboard', label: 'Dashboard', icon: LayoutGrid },
-  { id: 'data-upload', label: 'Data Upload', icon: CloudUpload },
-  { id: 'agent-analytics', label: 'Agent Analytics', icon: TrendingUp },
-  { id: 'active-campaigns', label: 'Active Campaigns', icon: Megaphone },
-  { id: 'settings', label: 'Settings', icon: Settings, hasDivider: true },
+  { id: "dashboard", label: "Studio", icon: WandSparkles },
+  { id: "agent-analytics", label: "Agent Analytics", icon: TrendingUp },
+  { id: "active-campaigns", label: "Active Campaigns", icon: Megaphone },
+  { id: "settings", label: "Settings", icon: Settings, hasDivider: true },
 ];
+
+// Data Viewer Constants
+export const PAGE_SIZE = 5;
+
+
+// Policy Presets & DB Config
+export const POLICY_PRESETS: string[] = [
+  "Max 15% discount for legal partners",
+  "Include free consultation audit",
+];
+
+export const DB_CONFIG = {
+  NAME: "OptimicStudioDB",
+  STORE: "datasets",
+  VERSION: 1,
+} as const;
+
