@@ -2,12 +2,12 @@
 from langgraph.graph import StateGraph, END
 from langchain.messages import HumanMessage, SystemMessage
 
-from main import MarketingState
-from main import GENERATION_PROMPT
-from main import OPTIMISATION_PROMPT
-from main import VALIDATION_PROMPT
-from main import SCORING_PROMPT
-from main import basic_llm
+from state import MarketingState
+from state import GENERATION_PROMPT
+from state import OPTIMISATION_PROMPT
+from state import VALIDATION_PROMPT
+from state import SCORING_PROMPT
+from state import basic_llm
 
 
 
