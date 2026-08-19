@@ -1,18 +1,13 @@
-# Import package
+# Import packages
 from fastapi import FastAPI
 import os
-from langgraph.graph import StateGraph, END, MessagesState
-from langchain_groq import ChatGroq
 from dotenv import load_dotenv
-from typing_extensions import TypedDict, Literal, Annotated
-from langchain.messages import HumanMessage, SystemMessage, AnyMessage
-from langgraph.graph.message import add_messages
-from langchain.tools import tool
-from tavily import TavilyClient
-from pydantic import BaseModel, Field
-from pprint import pprint
-from IPython.display import Markdown, display, Image
-from langgraph.prebuilt import ToolNode
+from typing_extensions import TypedDict, Literal
+from langchain_groq import ChatGroq
+from pydantic import BaseModel
+
+# Import graph and agents
+from agents import compile_state_graph
 
 
 # Load Env Vars
@@ -37,6 +32,11 @@ VALIDATION_PROMPT = f.read()
 
 
 
+# Define Data Models
+class GenerateData(BaseModel):
+    customer_data: str
+    policies: str
+
 # State Definition
 class MarketingState(TypedDict):
     offre_rules: str
@@ -47,11 +47,12 @@ class MarketingState(TypedDict):
     optimized_offre: str
     next: Literal["SCORING", "GENERATION", "VALIDATION", "OPTIMISATION", "END"]
 
-
 # Start Point
 app = FastAPI()
 
 
+# Define Graph
+app = compile_state_graph()
 
 @app.get("/")
 def hello_world():
@@ -59,14 +60,29 @@ def hello_world():
 
 # DATA = Offre + Policies
 @app.post("/generate")
-def generate():
-    customer_data = ""
-    offre_rules = ""
-    pass
-
+def generate_offre(data: GenerateData):
+    customer_data = data["customer_data"] 
+    policies = data["policies"]
+    
+    # Build State
+    state: MarketingState = {
+        "offre_rules": policies,
+        "customer_data": customer_data,
+        "score": "",
+        "offre": "",
+        "validation_feedback": "",
+        "optimized_offre": "",
+        "next": "SCORING"
+    }
+    final_state = app.invoke(state)
+    print(f"Final State: {final_state}")
+    return final_state
+        
 
 # DATA = Offre + Feedback
-@app.post("/feedback")
-def feedback():
+@app.post("/analyse")
+def analyse():
+    return {"message": "Analyse endpoint not implemented yet."}
     pass
+
 
