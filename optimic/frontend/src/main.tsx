@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 const clientId = import.meta.env.VITE_YOUR_GOOGLE_CLIENT_ID;
+import "./main.css";
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <GoogleOAuthProvider clientId={clientId}>

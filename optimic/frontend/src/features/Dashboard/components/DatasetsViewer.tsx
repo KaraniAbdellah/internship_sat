@@ -65,7 +65,10 @@ export default function DatasetsViewer() {
   };
 
   return (
-    <aside className="w-64 border-r border-orange-100/80 bg-white/70 backdrop-blur-sm p-4 flex flex-col justify-between shrink-0 select-none min-h-[calc(100vh-4rem)]">
+    <aside
+      className="w-64 p-4 flex flex-col j
+    ustify-between select-none bg-white border-r border-slate-200 min-h-[calc(100vh-4rem)]"
+    >
       <input
         ref={fileInputRef}
         type="file"

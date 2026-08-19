@@ -6,12 +6,12 @@ import {
   Users,
   ChevronLeft,
   ChevronRight,
+  Database,
 } from "lucide-react";
 
 import { DatasetContext } from "@/global/context/DatasetContext";
 import { CustomerDataContext } from "@/global/context/CustomerDataContext";
 import { PAGE_SIZE } from "../constants/conts";
-
 
 export default function DataViewer() {
   const datasetCtx = useContext(DatasetContext);
@@ -92,32 +92,38 @@ export default function DataViewer() {
     }
   };
 
-
   return (
-    <div className="space-y-4">
-
-
-      {/* ── Table Card ────────────────────────────────────────────── */}
-      <div className="bg-white rounded-3xl border border-orange-100 shadow-sm p-6 space-y-4">
+    <div className="w-full">
+      {/* ── Table Container Card ─────────────────────────────────────────── */}
+      <div className="bg-white border-l border-slate-200/80 p-5 space-y-4">
         {/* Table Top Bar */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
-          <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-xl bg-orange-50 text-orange-600">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+          <div className="flex items-center gap-3">
+            <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-orange-50 text-orange-600 border border-orange-200/60 shrink-0">
               <Users className="w-4 h-4" />
             </div>
             <div>
-              <h2 className="text-xs font-bold text-slate-900">
-                Active Dataset: {activeDataset?.name || "No dataset selected"}
-              </h2>
-              <p className="text-[10px] text-slate-400">
-                Click rows to toggle injection into offer prompt
+              <div className="flex items-center gap-2">
+                <h2 className="text-xs font-extrabold uppercase tracking-wide text-slate-800">
+                  {activeDataset?.name ? (
+                    <span className="text-slate-900">{activeDataset.name}</span>
+                  ) : (
+                    <span className="text-slate-400">No dataset selected</span>
+                  )}
+                </h2>
+              </div>
+              <p className="text-[11px] font-medium text-slate-500 mt-0.5">
+                Click any row to toggle audience injection into the offer prompt
               </p>
             </div>
           </div>
 
-          <span className="px-3 py-1 bg-orange-50 text-orange-700 text-xs font-bold rounded-full border border-orange-200">
-            {selectedIds.length} Targets Selected
-          </span>
+          <div className="flex items-center gap-2 self-start sm:self-auto">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-orange-50/90 text-orange-700 text-xs font-bold rounded-full border border-orange-200/70">
+              <span className="w-1.5 h-1.5 rounded-full bg-orange-500" />
+              {selectedIds.length} Targets Selected
+            </span>
+          </div>
         </div>
 
         {/* Search Bar */}
@@ -127,91 +133,113 @@ export default function DataViewer() {
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search active dataset by name, phone, email, or city..."
-            className="w-full pl-9 pr-4 py-2 text-xs bg-slate-50 border border-slate-200/80 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition"
+            placeholder="Search active dataset rows by keyword, email, phone, city..."
+            className="w-full pl-9 pr-4 py-2.5 text-xs bg-slate-50/70 hover:bg-slate-50 focus:bg-white border border-slate-200/80 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all placeholder:text-slate-400 text-slate-800"
           />
         </div>
 
-        {/* Dynamic Table */}
+        {/* Dynamic Table & Empty States */}
         {!activeDataset || rows.length === 0 ? (
-          <div className="py-12 text-center text-xs text-slate-400">
-            No rows available. Please upload or select a dataset from the
-            sidebar.
+          <div className="py-14 flex flex-col items-center justify-center rounded-xl border border-dashed border-slate-200 bg-slate-50/40 text-center px-4">
+            <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-400 mb-2.5">
+              <Database className="w-5 h-5" />
+            </div>
+            <p className="text-xs font-bold text-slate-700">No data available</p>
+            <p className="text-[11px] text-slate-400 mt-0.5 max-w-sm">
+              Please upload or activate a CSV dataset from the top bar to inspect records.
+            </p>
           </div>
         ) : (
           <>
-            <div className="border border-slate-100 rounded-2xl overflow-x-auto shadow-2xs">
-              <table className="w-full text-left text-xs text-slate-600 border-collapse">
+            <div className="border border-slate-200/80 rounded-xl overflow-hidden overflow-x-auto">
+              <table className="w-full text-left text-xs border-collapse">
                 <thead>
-                  <tr className="bg-orange-50/40 border-b border-orange-100 text-[10px] font-bold text-orange-950 uppercase tracking-wider">
-                    <th className="py-3 px-3 w-10 text-center">
+                  <tr className="bg-slate-50/80 border-b border-slate-200/80 text-[10px] font-bold text-slate-600 uppercase tracking-wider">
+                    <th className="py-3 px-3.5 w-11 text-center">
                       <button
                         type="button"
                         onClick={toggleSelectAll}
-                        className="cursor-pointer flex items-center justify-center mx-auto"
+                        className="cursor-pointer flex items-center justify-center mx-auto transition-transform active:scale-95"
+                        title={
+                          selectedIds.length === filteredRows.length
+                            ? "Deselect all"
+                            : "Select all"
+                        }
                       >
                         {selectedIds.length === filteredRows.length &&
                         filteredRows.length > 0 ? (
                           <CheckSquare className="w-4 h-4 text-orange-600" />
                         ) : (
-                          <Square className="w-4 h-4 text-slate-300" />
+                          <Square className="w-4 h-4 text-slate-300 hover:text-slate-400 transition-colors" />
                         )}
                       </button>
                     </th>
                     {activeDataset.headers?.map((h, i) => (
-                      <th key={i} className="py-3 px-3 whitespace-nowrap">
+                      <th key={i} className="py-3 px-3.5 whitespace-nowrap font-bold">
                         {h}
                       </th>
                     ))}
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
-                  {paginatedRows.map(({ id, cells }) => {
-                    const isSelected = selectedIds.includes(id);
-
-                    return (
-                      <tr
-                        key={id}
-                        onClick={() => toggleRow(id, cells)}
-                        className={`cursor-pointer transition select-none ${
-                          isSelected
-                            ? "bg-orange-50/50 hover:bg-orange-50/70 text-slate-900 font-semibold"
-                            : "hover:bg-slate-50 text-slate-600"
-                        }`}
+                <tbody className="divide-y divide-slate-100 bg-white">
+                  {paginatedRows.length === 0 ? (
+                    <tr>
+                      <td
+                        colSpan={(activeDataset.headers?.length || 0) + 1}
+                        className="py-10 text-center text-xs text-slate-400"
                       >
-                        <td className="py-3 px-3 text-center">
-                          {isSelected ? (
-                            <CheckSquare className="w-4 h-4 text-orange-600 mx-auto" />
-                          ) : (
-                            <Square className="w-4 h-4 text-slate-300 mx-auto" />
-                          )}
-                        </td>
-                        {cells.map((cell, cIdx) => (
-                          <td
-                            key={cIdx}
-                            className="py-3 px-3 whitespace-nowrap max-w-[220px] truncate"
-                          >
-                            {cell || "—"}
+                        No matching records found for "{searchTerm}"
+                      </td>
+                    </tr>
+                  ) : (
+                    paginatedRows.map(({ id, cells }) => {
+                      const isSelected = selectedIds.includes(id);
+
+                      return (
+                        <tr
+                          key={id}
+                          onClick={() => toggleRow(id, cells)}
+                          className={`cursor-pointer transition-colors duration-150 select-none ${
+                            isSelected
+                              ? "bg-orange-50/60 hover:bg-orange-50/80 text-slate-900 font-medium"
+                              : "hover:bg-slate-50/80 text-slate-600"
+                          }`}
+                        >
+                          <td className="py-2.5 px-3.5 text-center">
+                            {isSelected ? (
+                              <CheckSquare className="w-4 h-4 text-orange-600 mx-auto" />
+                            ) : (
+                              <Square className="w-4 h-4 text-slate-300 mx-auto transition-colors group-hover:text-slate-400" />
+                            )}
                           </td>
-                        ))}
-                      </tr>
-                    );
-                  })}
+                          {cells.map((cell, cIdx) => (
+                            <td
+                              key={cIdx}
+                              className="py-2.5 px-3.5 whitespace-nowrap max-w-[240px] truncate text-xs"
+                            >
+                              {cell || <span className="text-slate-300">—</span>}
+                            </td>
+                          ))}
+                        </tr>
+                      );
+                    })
+                  )}
                 </tbody>
               </table>
             </div>
 
-            {/* ── Pagination Controls ──────────────────────────────── */}
+            {/* ── Pagination Controls ──────────────────────────────────── */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2 text-xs text-slate-500">
-              <span className="text-[11px] text-slate-400">
+              <span className="text-[11px] font-medium text-slate-500">
                 Showing{" "}
-                <strong className="text-slate-700">
+                <span className="font-bold text-slate-800">
                   {filteredRows.length === 0 ? 0 : startIndex + 1}
-                </strong>{" "}
-                to <strong className="text-slate-700">{endIndex}</strong> of{" "}
-                <strong className="text-slate-700">
+                </span>{" "}
+                to{" "}
+                <span className="font-bold text-slate-800">{endIndex}</span> of{" "}
+                <span className="font-bold text-slate-800">
                   {filteredRows.length}
-                </strong>{" "}
+                </span>{" "}
                 records
               </span>
 
@@ -220,7 +248,7 @@ export default function DataViewer() {
                   type="button"
                   disabled={currentPage === 1}
                   onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
-                  className="p-1.5 rounded-xl border border-slate-200/80 bg-white hover:bg-orange-50 hover:border-orange-200 text-slate-600 disabled:opacity-40 disabled:pointer-events-none transition cursor-pointer"
+                  className="p-1.5 rounded-xl border border-slate-200 bg-white hover:bg-orange-50 hover:border-orange-200 text-slate-600 hover:text-orange-600 disabled:opacity-40 disabled:pointer-events-none transition-colors cursor-pointer"
                   title="Previous Page"
                 >
                   <ChevronLeft className="w-4 h-4" />
@@ -243,15 +271,17 @@ export default function DataViewer() {
                       return (
                         <React.Fragment key={page}>
                           {isEllipsis && (
-                            <span className="px-1 text-slate-400">...</span>
+                            <span className="px-1 text-slate-400 font-bold text-[10px]">
+                              ...
+                            </span>
                           )}
                           <button
                             type="button"
                             onClick={() => setCurrentPage(page)}
-                            className={`w-7 h-7 rounded-xl text-xs font-semibold transition cursor-pointer ${
+                            className={`w-7 h-7 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                               isActive
-                                ? "bg-orange-600 text-white shadow-xs"
-                                : "bg-white hover:bg-orange-50 border border-slate-200/80 text-slate-600 hover:text-orange-600 hover:border-orange-200"
+                                ? "bg-orange-600 text-white"
+                                : "bg-white hover:bg-orange-50 border border-slate-200 text-slate-600 hover:text-orange-600 hover:border-orange-200"
                             }`}
                           >
                             {page}
@@ -267,7 +297,7 @@ export default function DataViewer() {
                   onClick={() =>
                     setCurrentPage((p) => Math.min(p + 1, totalPages))
                   }
-                  className="p-1.5 rounded-xl border border-slate-200/80 bg-white hover:bg-orange-50 hover:border-orange-200 text-slate-600 disabled:opacity-40 disabled:pointer-events-none transition cursor-pointer"
+                  className="p-1.5 rounded-xl border border-slate-200 bg-white hover:bg-orange-50 hover:border-orange-200 text-slate-600 hover:text-orange-600 disabled:opacity-40 disabled:pointer-events-none transition-colors cursor-pointer"
                   title="Next Page"
                 >
                   <ChevronRight className="w-4 h-4" />

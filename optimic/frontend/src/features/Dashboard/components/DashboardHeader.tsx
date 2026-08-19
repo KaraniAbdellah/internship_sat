@@ -8,7 +8,6 @@ import { DatasetType } from "@/global/types/DatasetType";
 import { parseCSV } from "../utils/csvParser";
 import { persistDataset } from "../services/datasetDb";
 
-
 export default function DashboardHeader() {
   const datasetCtx = useContext(DatasetContext);
   const customerCtx = useContext(CustomerDataContext);
@@ -52,7 +51,7 @@ export default function DashboardHeader() {
   };
 
   return (
-    <header className="h-16 border-b border-orange-100/80 bg-white/90 backdrop-blur-md px-6 flex items-center justify-between sticky top-0 z-30 select-none">
+    <header className="h-16 border-b border-slate-200/70 bg-white/80 backdrop-blur-xl px-6 flex items-center justify-between sticky top-0 z-30 select-none">
       <input
         ref={fileInputRef}
         type="file"
@@ -62,13 +61,22 @@ export default function DashboardHeader() {
       />
 
       {/* Brand & Badge */}
-      <div className="flex items-center gap-3">
-        <div className="w-8 h-8 rounded-xl bg-orange-600 text-white flex items-center justify-center font-bold shadow-md shadow-orange-500/20">
-          <Sparkles className="w-4 h-4" />
+      <div className="flex items-center gap-3.5">
+        <div className="relative group">
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-orange-600 via-orange-500 to-amber-500 text-white flex items-center justify-center font-bold ring-1 ring-white/20 transition-transform duration-200 group-hover:scale-105">
+            <Sparkles className="w-4 h-4" />
+          </div>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="text-sm font-bold text-slate-900">Optimic Studio</span>
-          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-orange-50 text-orange-700 border border-orange-200">
+
+        <div className="flex items-center gap-2.5">
+          <span className="text-sm font-extrabold tracking-tight text-slate-900">
+            Optimic Studio
+          </span>
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-orange-50/80 text-orange-700 border border-orange-200/70">
+            <span className="relative flex h-1.5 w-1.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-orange-500"></span>
+            </span>
             Multi-Dataset Active
           </span>
         </div>
@@ -77,13 +85,15 @@ export default function DashboardHeader() {
       {/* Right Controls: Active Dataset Indicator + Upload Button */}
       <div className="flex items-center gap-3">
         {activeDataset && (
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-orange-50/60 border border-orange-200/60 text-xs">
-            <FileSpreadsheet className="w-3.5 h-3.5 text-orange-600 shrink-0" />
-            <span className="font-semibold text-slate-800 text-[11px] truncate max-w-[240px]">
+          <div className="flex items-center gap-2.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-50 border border-slate-200/80 text-xs transition-all duration-200">
+            <div className="flex items-center justify-center w-6 h-6 rounded-lg bg-orange-100 text-orange-600 shrink-0">
+              <FileSpreadsheet className="w-3.5 h-3.5" />
+            </div>
+            <span className="font-semibold text-slate-800 text-[12px] truncate max-w-[200px]">
               {activeDataset.name}
             </span>
-            <span className="text-orange-600 font-medium text-[10px]">
-              ({activeDataset.rowCount} rows)
+            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-orange-50 text-orange-700 border border-orange-200/60 font-mono">
+              {activeDataset.rowCount.toLocaleString()} rows
             </span>
           </div>
         )}
@@ -91,9 +101,9 @@ export default function DashboardHeader() {
         <button
           type="button"
           onClick={() => fileInputRef.current?.click()}
-          className="px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white text-xs font-bold rounded-xl shadow-md shadow-orange-600/20 transition flex items-center gap-1.5 cursor-pointer"
+          className="group relative inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-orange-600 to-amber-500 hover:from-orange-500 hover:to-amber-500 text-white text-xs font-bold rounded-xl transition-all duration-200 active:scale-98 cursor-pointer"
         >
-          <Upload className="w-3.5 h-3.5" />
+          <Upload className="w-3.5 h-3.5 transition-transform duration-200 group-hover:-translate-y-0.5" />
           <span>Upload CSV</span>
         </button>
       </div>
