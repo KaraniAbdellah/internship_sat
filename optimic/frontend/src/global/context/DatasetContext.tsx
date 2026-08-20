@@ -5,7 +5,7 @@ export type DatasetContextValue = {
   datasets: DatasetType[];
   setDatasets: Dispatch<SetStateAction<DatasetType[]>>;
   activeDataset: DatasetType | null;
-  setActiveDataset: Dispatch<SetStateAction<DatasetType | null>>;
+  setActiveDataset: Dispatch<SetStateAction<DatasetType>>;
 };
 
 export const DatasetContext = createContext<DatasetContextValue | null>(null);
