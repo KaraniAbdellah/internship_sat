@@ -1,5 +1,8 @@
 # Import packages
+from urllib import response
+
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 # Import state
@@ -14,9 +17,22 @@ class Data(BaseModel):
     customer_data: str = "no customer data"
     policies: str = "no offre polices"
 
+
+# define origins
+origins = [
+    "http://localhost:5173",
+    "https://internship-sat.vercel.app",
+]
+
 # Start Point
 app = FastAPI()
-
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Define Graph
 graph = compile_state_graph()
@@ -27,23 +43,27 @@ def hello_world():
 
 # DATA = Offre + Policies
 @app.post("/generate")
-def generate_offre(data: Data):
-    customer_data = data.customer_data 
-    policies = data.policies
-    
-    # Build State
-    state: MarketingState = {
-        "offre_rules": policies,
-        "customer_data": customer_data,
+async def generate_offre(data: Data):
+    initial_state: MarketingState = {
+        "offre_rules": data.policies,
+        "customer_data": data.customer_data,
         "score": "",
         "offre": "",
         "validation_feedback": "",
         "optimized_offre": "",
-        "next": "SCORING"
+        "is_valid": False,
     }
-    final_state = graph.invoke(state)
-    return {"message": "Offre generation completed.", "final_state": final_state}
-        
+
+    final_state = await graph.ainvoke(initial_state)
+
+    return {
+        "offre_rules": final_state.get("offre_rules"),
+        "customer_data": final_state.get("customer_data"),
+        "score": final_state.get("score"),
+        "offre": final_state.get("offre"),
+        "validation_feedback": final_state.get("validation_feedback"),
+        "optimized_offre": final_state.get("optimized_offre") or final_state.get("offre"),
+    }
 
 # DATA = Offre + Feedback
 @app.post("/analyse")

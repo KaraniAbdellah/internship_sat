@@ -1,5 +1,4 @@
 # this file for prevent "Resolving Circular Imports in Python"
-
 from langchain_groq import ChatGroq
 from langchain_google_genai import ChatGoogleGenerativeAI
 from typing_extensions import TypedDict, Literal
@@ -7,7 +6,12 @@ import os
 from dotenv import load_dotenv
 from langchain_groq import ChatGroq
 
+# Prompt Caching
+from langchain_core.globals import set_llm_cache
+from langchain_community.cache import InMemoryCache
 
+
+set_llm_cache(InMemoryCache())
 
 # Load Env Vars
 load_dotenv(".env")
@@ -16,9 +20,12 @@ TAVILY_API_KEY = os.getenv("TAVILY_API_KEY")
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 
 # Define LLM
-# basic_llm = ChatGroq(model="llama-3.1-8b-instant", api_key = GROQ_API_KEY, temperature=0)
-basic_llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash", temperature=0, max_tokens=4696, api_key=GOOGLE_API_KEY)
-
+# basic_llm = ChatGroq(model="llama-3.1-8b-instant", api_key = GROQ_API_KEY, temperature=0.3)
+fast_llm = ChatGoogleGenerativeAI(
+    model="gemini-2.5-flash",
+    temperature=0.2,
+    api_key=GOOGLE_API_KEY
+)
 
 # State Definition    
 class MarketingState(TypedDict):
@@ -40,5 +47,4 @@ f = open("./prompts/scoring.md")
 SCORING_PROMPT = f.read()
 f = open("./prompts/validation.md")
 VALIDATION_PROMPT = f.read()
-
 

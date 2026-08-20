@@ -1,15 +1,23 @@
-import { useEffect, useContext } from "react";
+import { useEffect, useContext, useState } from "react";
 import toast from "react-hot-toast";
 
-import DashboardHeader from "./DashboardHeader";
-import DatasetsViewer from "./DatasetsViewer";
 import DatasetWorkspace from "./DatasetWorkspace";
+import StudioPageLayout from "./layouts/StudioPageLayout";
+import StudioWorkspaceLayout from "./layouts/StudioWorkspaceLayout";
+import RightSidebar from "./right-panel/RightSidebar";
 
 import { DatasetContext } from "@/global/context/DatasetContext";
+import { CustomerDataContext } from "@/global/context/CustomerDataContext";
 import { getStoredDatasets } from "../services/datasetDb";
+import { OfferResult } from "../types/OfferResult";
 
 export default function OptimicStudio() {
   const datasetCtx = useContext(DatasetContext);
+  const customerCtx = useContext(CustomerDataContext);
+
+  const [offerResult, setOfferResult] = useState<OfferResult | null>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const selectedCount = customerCtx?.customerData?.length || 0;
 
   useEffect(() => {
     async function hydrateDB() {
@@ -27,13 +35,24 @@ export default function OptimicStudio() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#FDFBF9] text-slate-800 flex flex-col font-sans antialiased">
-      <DashboardHeader />
-
-      <div className="flex-1 flex overflow-hidden">
-        <DatasetsViewer />
-        <DatasetWorkspace />
-      </div>
-    </div>
+    <StudioPageLayout
+      workspace={
+        <StudioWorkspaceLayout
+          centerArea={
+            <DatasetWorkspace
+              onOfferGenerated={setOfferResult}
+              onGeneratingChange={setIsGenerating}
+            />
+          }
+          rightSidebar={
+            <RightSidebar
+              offerResult={offerResult}
+              isGenerating={isGenerating}
+              selectedCount={selectedCount}
+            />
+          }
+        />
+      }
+    />
   );
 }

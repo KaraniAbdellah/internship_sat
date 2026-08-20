@@ -7,7 +7,7 @@ from state import GENERATION_PROMPT
 from state import OPTIMISATION_PROMPT
 from state import VALIDATION_PROMPT
 from state import SCORING_PROMPT
-from state import basic_llm
+from state import fast_llm
 
 
 
@@ -16,7 +16,7 @@ def scoring_agent(state: MarketingState):
     print("Scoring Agent ...")
     customer_data = state.get("customer_data", "no customer data")
     messages = [HumanMessage(content=f"Customer Data: {customer_data}"), SystemMessage(content=SCORING_PROMPT)]
-    score = basic_llm.invoke(messages)
+    score = fast_llm.ainvoke(messages) # Asynchronously ainvoke
 
     return {
         "score": score,
@@ -45,7 +45,7 @@ def generation_agent(state: MarketingState):
             """
         )
     ]
-    offre = basic_llm.invoke(messages)
+    offre = fast_llm.ainvoke(messages)
     return {
         "offre": offre,
         "next": "VALIDATION"
@@ -66,7 +66,7 @@ def validation_agent(state: MarketingState):
         """
     )]
 
-    response = basic_llm.invoke(messages)
+    response = fast_llm.ainvoke(messages)
     return {"validation_feedback": response, "next": "OPTIMISATION"}
 
 
@@ -83,7 +83,7 @@ def optmisation_agent(state: MarketingState):
             {offre}
         """)]
     
-    response = basic_llm.invoke(messages)
+    response = fast_llm.ainvoke(messages)
     return {"optimized_offre": response, "next": "END"}
 
 # Supervisor agent

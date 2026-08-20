@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import Sidebar from './Sidebar';
 import { NAV_ITEMS } from '../constants/conts';
+import AppLayout from './layouts/AppLayout';
 
 // 1. Import your page components
 import OptimicStudio from './OptimicStudio';
@@ -28,16 +29,15 @@ export default function Optimic() {
   const ActiveComponent = VIEWS[activeId];
 
   return (
-    <div className="flex h-screen w-full overflow-hidden bg-[#f8fafc] font-sans antialiased">
-      <Sidebar activeId={activeId} onSelect={setActiveId} />
-
-      <main className="flex-1 overflow-y-auto">
-        {ActiveComponent ? (
+    <AppLayout
+      sidebar={<Sidebar activeId={activeId} onSelect={setActiveId} />}
+      content={
+        ActiveComponent ? (
           <ActiveComponent />
         ) : (
           <Placeholder label={activeItem.label} />
-        )}
-      </main>
-    </div>
+        )
+      }
+    />
   );
 }

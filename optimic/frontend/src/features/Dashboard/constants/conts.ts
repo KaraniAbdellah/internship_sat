@@ -1,8 +1,8 @@
 import { TrendingUp, Megaphone, Settings, WandSparkles } from "lucide-react";
 
 export const NAV_ITEMS = [
-  { id: "dashboard", label: "Studio", icon: WandSparkles },
   { id: "agent-analytics", label: "Agent Analytics", icon: TrendingUp },
+  { id: "dashboard", label: "Studio", icon: WandSparkles },
   { id: "active-campaigns", label: "Active Campaigns", icon: Megaphone },
   { id: "settings", label: "Settings", icon: Settings, hasDivider: true },
 ];
