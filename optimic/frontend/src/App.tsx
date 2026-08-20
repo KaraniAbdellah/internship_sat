@@ -20,7 +20,7 @@ import { OfferResultType } from "./global/types/OfferResultType";
 function App() {
   const [datasets, setDatasets] = useState<DatasetType[]>([]);
   const [activeDataset, setActiveDataset] = useState<DatasetType | null>(null);
-  const [customerData, setCustomerData] = useState<CustomerDataType[] | null>(
+  const [customerData, setCustomerData] = useState<CustomerDataType[]>(
     [],
   );
   const [offreResult, setOffreResult] = useState<OfferResultType[]>([]);
