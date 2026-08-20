@@ -1,4 +1,4 @@
-import { useEffect, useContext, useState } from "react";
+import { useEffect, useContext } from "react";
 import toast from "react-hot-toast";
 
 import DatasetWorkspace from "./DatasetWorkspace";
@@ -9,14 +9,11 @@ import RightSidebar from "./right-panel/RightSidebar";
 import { DatasetContext } from "@/global/context/DatasetContext";
 import { CustomerDataContext } from "@/global/context/CustomerDataContext";
 import { getStoredDatasets } from "../services/datasetDb";
-import { OfferResult } from "../types/OfferResult";
 
 export default function OptimicStudio() {
   const datasetCtx = useContext(DatasetContext);
   const customerCtx = useContext(CustomerDataContext);
 
-  const [offerResult, setOfferResult] = useState<OfferResult | null>(null);
-  const [isGenerating, setIsGenerating] = useState(false);
   const selectedCount = customerCtx?.customerData?.length || 0;
 
   useEffect(() => {
@@ -38,19 +35,8 @@ export default function OptimicStudio() {
     <StudioPageLayout
       workspace={
         <StudioWorkspaceLayout
-          centerArea={
-            <DatasetWorkspace
-              onOfferGenerated={setOfferResult}
-              onGeneratingChange={setIsGenerating}
-            />
-          }
-          rightSidebar={
-            <RightSidebar
-              offerResult={offerResult}
-              isGenerating={isGenerating}
-              selectedCount={selectedCount}
-            />
-          }
+          centerArea={<DatasetWorkspace />}
+          rightSidebar={<RightSidebar selectedCount={selectedCount} />}
         />
       }
     />

@@ -59,9 +59,9 @@ async def generate_offre(data: Data):
     return {
         "offre_rules": final_state.get("offre_rules"),
         "customer_data": final_state.get("customer_data"),
-        "score": final_state.get("score"),
-        "offre": final_state.get("offre"),
-        "validation_feedback": final_state.get("validation_feedback"),
+        "score": "Score is that this customer love t-shirt and he is a loyal customer" + final_state.get("score"),
+        "offre": "The Offre is you need to take buy this products right know",
+        "validation_feedback": "feedback is the offre does not match the dicount" + final_state.get("validation_feedback"),
         "optimized_offre": final_state.get("optimized_offre") or final_state.get("offre"),
     }
 

@@ -1,28 +1,22 @@
-import React, { useContext, useRef, useEffect, useState } from "react";
+import { useContext, useRef, useEffect, useState } from "react";
 import { Paperclip, Sparkles, Send, Loader2, X, AlertTriangle } from "lucide-react";
 import toast from "react-hot-toast";
 
 import { DatasetContext } from "@/global/context/DatasetContext";
 import { CustomerDataContext } from "@/global/context/CustomerDataContext";
+import { OfferResultContext } from "@/global/context/OfferResultContext";
 import { readTextFile } from "../utils/fileReader";
 import { persistPolicy } from "../services/datasetDb";
 import { generateOffre } from "../services/generateOffre";
-import { OfferResult } from "../types/OfferResult";
+import { OfferResultType } from "@/global/types/OfferResultType";
 
 const MIN_TEXTAREA_HEIGHT = 44;
 const MAX_TEXTAREA_HEIGHT = 200;
 
-type OfferGeneratorProps = {
-  onOfferGenerated?: (result: OfferResult) => void;
-  onGeneratingChange?: (isGenerating: boolean) => void;
-};
-
-export default function OfferGenerator({
-  onOfferGenerated,
-  onGeneratingChange,
-}: OfferGeneratorProps) {
+export default function OfferGenerator() {
   const datasetCtx = useContext(DatasetContext);
   const customerCtx = useContext(CustomerDataContext);
+  const offreResultCtx = useContext(OfferResultContext);
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
@@ -93,7 +87,7 @@ export default function OfferGenerator({
     }
 
     setIsLoading(true);
-    onGeneratingChange?.(true);
+    offreResultCtx?.setIsGenerated(false);
     setErrorMessage(null);
 
     try {
@@ -102,16 +96,22 @@ export default function OfferGenerator({
         policies: policy,
       };
 
-      const result: OfferResult = await generateOffre(payload);
-      onOfferGenerated?.(result);
+      const result: OfferResultType = await generateOffre(payload);
+      
+      if (offreResultCtx) {
+        offreResultCtx.setOffreResult((prev) => [result, ...prev]);
+        console.log("Offer result updated:", result);
+        offreResultCtx.setIsGenerated(true);
+      }
+
       toast.success(`Generated offer for ${customerData.length} target(s)!`);
     } catch (err: any) {
-      const msg = err.message || "An unexpected error occurred while generating offer.";
+      const msg =
+        err.message || "An unexpected error occurred while generating offer.";
       setErrorMessage(msg);
       toast.error(msg, { duration: 5000 });
     } finally {
       setIsLoading(false);
-      onGeneratingChange?.(false);
     }
   };
 
