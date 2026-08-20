@@ -20,7 +20,9 @@ import { OfferResultType } from "./global/types/OfferResultType";
 function App() {
   const [datasets, setDatasets] = useState<DatasetType[]>([]);
   const [activeDataset, setActiveDataset] = useState<DatasetType | null>(null);
-  const [customerData, setCustomerData] = useState<CustomerDataType[]>([]);
+  const [customerData, setCustomerData] = useState<CustomerDataType[] | null>(
+    [],
+  );
   const [offreResult, setOffreResult] = useState<OfferResultType[]>([]);
   const [isGenerated, setIsGenerated] = useState<boolean>(false);
 
@@ -65,7 +67,10 @@ function App() {
               <Route path="/optimic" element={<OptimicPage />} />
               <Route path="/" element={<HomePage />} />
               <Route path="/auth" element={<AuthPage />} />
-              <Route path="/terms-of-service" element={<Terms_of_ServicePage />} />
+              <Route
+                path="/terms-of-service"
+                element={<Terms_of_ServicePage />}
+              />
               <Route path="*" element={<NotFoundPage />} />
             </Routes>
           </OfferResultContext.Provider>
