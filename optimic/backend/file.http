@@ -8,6 +8,6 @@ POST http://127.0.0.1:8000/generate HTTP/1.1
 Content-Type: application/json
 
 {
-    "customer_data": "no customer data yet",
+    "customer_data": "I have a client who spent 10 dollars on online shopping products during the last month.The client made purchases, mainly buying electronics and accessories. Their average order value is around 3.33 dollars, and they usually purchase during weekends. The client has been active for 6 months and shows moderate engagement with marketing campaigns.",
     "policies": "no policies yet"
 }

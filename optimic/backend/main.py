@@ -1,6 +1,4 @@
 # Import packages
-from urllib import response
-
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -16,6 +14,7 @@ from agents import compile_state_graph
 class Data(BaseModel):
     customer_data: str = "no customer data"
     policies: str = "no offre polices"
+    thread_id: str = "thread-1"
 
 
 # define origins
@@ -41,33 +40,35 @@ graph = compile_state_graph()
 def hello_world():
     return {"message": "Hello, World!"}
 
+
+
+
 # DATA = Offre + Policies
 @app.post("/generate")
 async def generate_offre(data: Data):
-    initial_state: MarketingState = {
+    inputs = {
         "offre_rules": data.policies,
         "customer_data": data.customer_data,
-        "score": "",
-        "offre": "",
-        "validation_feedback": "",
-        "optimized_offre": "",
-        "is_valid": False,
+        "next": "SCORING",
     }
+    
+    # Thread 1: User Alice
+    config1 = {"configurable": {"thread_id": data.thread_id}}
 
-    final_state = await graph.ainvoke(initial_state)
 
+    final_state = await graph.ainvoke(inputs, config1)
     return {
         "offre_rules": final_state.get("offre_rules"),
         "customer_data": final_state.get("customer_data"),
-        "score": "Score is that this customer love t-shirt and he is a loyal customer" + final_state.get("score"),
-        "offre": "The Offre is you need to take buy this products right know",
-        "validation_feedback": "feedback is the offre does not match the dicount" + final_state.get("validation_feedback"),
-        "optimized_offre": final_state.get("optimized_offre") or final_state.get("offre"),
+        "score": final_state.get("score"),
+        "offre": final_state.get("offre"),
+        "validation_feedback": final_state.get("validation_feedback"),
+        "optimized_offre": final_state.get("optimized_offre")
     }
 
 # DATA = Offre + Feedback
 @app.post("/analyse")
-def analyse():
+async def analyse():
+    print("Analysing ...")
     return {"message": "Analyse endpoint not implemented yet."}
-
 

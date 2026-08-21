@@ -1,6 +1,8 @@
 # Import packages
 from langgraph.graph import StateGraph, END
-from langchain.messages import HumanMessage, SystemMessage
+from langchain.messages import AIMessage, HumanMessage, SystemMessage
+from langgraph.checkpoint.memory import InMemorySaver
+
 
 from state import MarketingState
 from state import GENERATION_PROMPT
@@ -11,21 +13,32 @@ from state import fast_llm
 
 
 
+
 # Scoring Agent
-def scoring_agent(state: MarketingState):
+async def scoring_agent(state: MarketingState):
     print("Scoring Agent ...")
     customer_data = state.get("customer_data", "no customer data")
-    messages = [HumanMessage(content=f"Customer Data: {customer_data}"), SystemMessage(content=SCORING_PROMPT)]
-    score = fast_llm.ainvoke(messages) # Asynchronously ainvoke
+    
+    messages_state = state.get("messages", [])
+    print("Messages State:", messages_state)
+    messages = [SystemMessage(content=SCORING_PROMPT), HumanMessage(content=f"""
+        Customer Data: \n\n
+            {customer_data}
+        """)]
+    
+    score = await fast_llm.ainvoke(messages) # Asynchronously ainvoke
 
     return {
-        "score": score,
-        "next": "GENERATION",
+        "messages": [
+            AIMessage(content=score.content)
+        ],
+        "score": score.content,
+        "next": "END",
     }
 
 
 # Generation Agent
-def generation_agent(state: MarketingState):
+async def generation_agent(state: MarketingState):
     print("Generation Agent ...")
     customer_data = state.get("customer_data", "no customer data")
     customer_score = state.get("score", "no score")
@@ -45,15 +58,15 @@ def generation_agent(state: MarketingState):
             """
         )
     ]
-    offre = fast_llm.ainvoke(messages)
+    offre = await fast_llm.ainvoke(messages)
     return {
-        "offre": offre,
+        "offre": offre.content,
         "next": "VALIDATION"
     }
 
 
 # Validation Agent
-def validation_agent(state: MarketingState):
+async def validation_agent(state: MarketingState):
     print("Validation Agent ...")
     offre = state.get("offre", "no offre")
     offre_rules = state.get("offre_rules", "no offre polices")
@@ -66,13 +79,12 @@ def validation_agent(state: MarketingState):
         """
     )]
 
-    response = fast_llm.ainvoke(messages)
-    return {"validation_feedback": response, "next": "OPTIMISATION"}
-
+    validation_feedback = await fast_llm.ainvoke(messages)
+    return {"validation_feedback": validation_feedback.content, "next": "OPTIMISATION"}
 
 
 # Optimisation Agent
-def optmisation_agent(state: MarketingState):
+async def optmisation_agent(state: MarketingState):
     print("Optimisation Agent ...")
     validation_feedback = state.get("validation_feedback", "no validation feedback")
     offre = state.get("offre", "no offre")
@@ -83,11 +95,12 @@ def optmisation_agent(state: MarketingState):
             {offre}
         """)]
     
-    response = fast_llm.ainvoke(messages)
-    return {"optimized_offre": response, "next": "END"}
+    optimized_offre = await fast_llm.ainvoke(messages)
+    return {"optimized_offre": optimized_offre.content, "next": "END"}
+
 
 # Supervisor agent
-def supervisor_agent(state: MarketingState):
+async def supervisor_agent(state: MarketingState):
     print("Supervisor Agent ...")
     return state
 
@@ -130,7 +143,9 @@ def compile_state_graph():
         }
     )
 
-    return workflow.compile()
+    # Memory
+    checkpointer = InMemorySaver()
+    return workflow.compile(checkpointer=checkpointer)
 
 
 
