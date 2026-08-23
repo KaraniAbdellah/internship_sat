@@ -23,3 +23,11 @@ export const DB_CONFIG = {
   VERSION: 1,
 } as const;
 
+
+
+
+// TABS
+export const TABS: Array<{ id: string; label: string }> = [
+  { id: "dataset-chat", label: "Dataset Chat" },
+  { id: "offer-studio", label: "Offer Studio" },
+];

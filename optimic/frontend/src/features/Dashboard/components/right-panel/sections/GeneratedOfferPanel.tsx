@@ -24,14 +24,6 @@ export default function GeneratedOfferPanel({
   const [copied, setCopied] = useState(false);
   const hasOffer = Boolean(offerResult?.optimized_offre || offerResult?.offre);
 
-  // Check if feedback flags a discount or policy mismatch
-  const isDiscountMismatch = Boolean(
-    offerResult?.validation_feedback?.toLowerCase().includes("discount") ||
-    offerResult?.validation_feedback?.toLowerCase().includes("mismatch") ||
-    offerResult?.validation_feedback?.toLowerCase().includes("remise") ||
-    offerResult?.validation_feedback?.toLowerCase().includes("does not match"),
-  );
-
   const handleCopy = () => {
     const text = offerResult?.optimized_offre || offerResult?.offre;
     if (!text) return;
@@ -40,6 +32,13 @@ export default function GeneratedOfferPanel({
     toast.success("Offer copied to clipboard!");
     setTimeout(() => setCopied(false), 2000);
   };
+
+  const sendOffre = () => {
+    // Implement the logic to send the offer to the selected customers
+    // This could involve calling an API endpoint or performing some action
+    toast.success(`Offer sent to ${selectedCount} customers!`);
+    
+  }
 
   return (
     <div className="h-full flex flex-col gap-3 bg-white">
@@ -106,6 +105,7 @@ export default function GeneratedOfferPanel({
         type="button"
         className="mt-auto h-11 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs shadow-xs disabled:opacity-40 disabled:pointer-events-none transition-all cursor-pointer"
         disabled={!hasOffer || selectedCount === 0 || isGenerating}
+        onClick={sendOffre}
       >
         Batch Send ({selectedCount})
       </button>

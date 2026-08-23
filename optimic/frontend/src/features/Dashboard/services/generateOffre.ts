@@ -54,3 +54,7 @@ export async function generateOffre(data: GenerateOfferPayload) {
     throw error;
   }
 }
+
+export async function sendOffre(data: GenerateOfferPayload) {  
+  
+}
