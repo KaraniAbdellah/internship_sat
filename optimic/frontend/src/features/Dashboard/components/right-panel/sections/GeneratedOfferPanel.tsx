@@ -99,11 +99,6 @@ export default function GeneratedOfferPanel({
         <p className="items-center px-2 py-0.5 rounded-md bg-orange-100 text-orange-800 font-bold text-[12px] border border-orange-200">
           {offerResult?.score || "N/A"}
         </p>
-        {offerResult?.validation_feedback && !isDiscountMismatch && (
-          <p className="text-[11px] text-slate-600 leading-relaxed pl-5.5">
-            {offerResult.validation_feedback}
-          </p>
-        )}
       </div>
 
       {/* Action CTA */}

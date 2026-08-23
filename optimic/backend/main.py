@@ -51,10 +51,9 @@ async def generate_offre(data: Data):
         "customer_data": data.customer_data,
         "next": "SCORING",
     }
-    
+
     # Thread 1: User Alice
     config1 = {"configurable": {"thread_id": data.thread_id}}
-
 
     final_state = await graph.ainvoke(inputs, config1)
     return {
@@ -71,4 +70,20 @@ async def generate_offre(data: Data):
 async def analyse():
     print("Analysing ...")
     return {"message": "Analyse endpoint not implemented yet."}
+
+
+# start chat with the dataset
+@app.post("/start-chat")
+async def start_chat():
+    # Rag Model to start chat with the dataset
+    pass
+
+
+# start ask next question to the dataset
+@app.post("/ask-question")
+async def ask_question():
+    # Rag Model to ask question about the dataset
+    pass
+
+
 

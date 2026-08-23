@@ -7,9 +7,9 @@ export default function ChatDatasetPanel() {
 
   return (
     <div className="h-full flex flex-col gap-3">
-      <div className="rounded-2xl border border-slate-200 bg-white p-3 text-xs text-slate-600 font-semibold">
-        Querying: {activeDataset?.name || "No active dataset"}
-      </div>
+      <button className="rounded-2xl bg-orange-600 hover:bg-orange-700 text-white px-4 py-3 text-xs font-bold">
+        start chatting with your dataset
+      </button>
 
       <div className="rounded-2xl border border-slate-200 bg-white p-3 text-xs text-slate-800 font-semibold leading-relaxed">
         Connect to {activeDataset?.name || "your dataset"} and ask anything about

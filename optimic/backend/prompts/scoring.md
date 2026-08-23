@@ -15,5 +15,5 @@ If no customer data is available, return exactly:
 ## Customer Data Available
 Return:
 **Score**: (X / 100)
-**Description**: Brief (less than 100 words) and direct explanation of why the customer received this score, based only on the available customer data.
+**Description**: Brief (less than 50 words) and direct explanation of why the customer received this score, based only on the available customer data.
 

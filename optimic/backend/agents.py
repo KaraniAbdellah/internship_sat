@@ -1,4 +1,6 @@
 # Import packages
+from urllib import response
+
 from langgraph.graph import StateGraph, END
 from langchain.messages import AIMessage, HumanMessage, SystemMessage
 from langgraph.checkpoint.memory import InMemorySaver
@@ -19,8 +21,6 @@ async def scoring_agent(state: MarketingState):
     print("Scoring Agent ...")
     customer_data = state.get("customer_data", "no customer data")
     
-    messages_state = state.get("messages", [])
-    print("Messages State:", messages_state)
     messages = [SystemMessage(content=SCORING_PROMPT), HumanMessage(content=f"""
         Customer Data: \n\n
             {customer_data}
@@ -29,32 +29,26 @@ async def scoring_agent(state: MarketingState):
     score = await fast_llm.ainvoke(messages) # Asynchronously ainvoke
 
     return {
-        "messages": [
-            AIMessage(content=score.content)
-        ],
         "score": score.content,
-        "next": "END",
+        "next": "GENERATION",
     }
 
 
 # Generation Agent
 async def generation_agent(state: MarketingState):
     print("Generation Agent ...")
-    customer_data = state.get("customer_data", "no customer data")
-    customer_score = state.get("score", "no score")
-    offre_rules = state.get('offre_rules', "no offre rules")
+    current_context = f"""
+        Customer Data: {state.get('customer_data')}
+        Customer Score: {state.get('score')}
+        Active Rules: {state.get('offre_rules')}
+    """
+    
     messages = [
         SystemMessage(content=GENERATION_PROMPT),
         HumanMessage(
             content=f"""
-            Customer Data: \n\n
-            {customer_data}
-            
-            Customer Score: \n\n
-            {customer_score}
-            
-            Offre Rules: \n\n
-            {offre_rules}
+            Current Context: \n\n   
+                {current_context}
             """
         )
     ]
@@ -86,17 +80,21 @@ async def validation_agent(state: MarketingState):
 # Optimisation Agent
 async def optmisation_agent(state: MarketingState):
     print("Optimisation Agent ...")
-    validation_feedback = state.get("validation_feedback", "no validation feedback")
-    offre = state.get("offre", "no offre")
-    messages = [SystemMessage(content=OPTIMISATION_PROMPT), HumanMessage(content=f"""
-        Validation feedback: \n\n
-            {validation_feedback}
-        Original Offer: \n\n 
-            {offre}
-        """)]
-    
-    optimized_offre = await fast_llm.ainvoke(messages)
-    return {"optimized_offre": optimized_offre.content, "next": "END"}
+    messages = [
+        SystemMessage(content=OPTIMISATION_PROMPT),
+        HumanMessage(
+            content=f"""
+            Current Offer: {state.get('offre')}
+            Validation Feedback: {state.get('validation_feedback')}
+            """
+        ),
+    ]
+    optimized = await fast_llm.ainvoke(messages)
+    return {
+        "optimized_offre": optimized.content,
+        "next": "END",
+    }
+
 
 
 # Supervisor agent

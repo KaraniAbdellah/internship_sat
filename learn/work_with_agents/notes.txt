@@ -1,38 +1,16 @@
 How I Work with AI Coding Agents ?
-TL;DR:
-// HOW I use AI:
---> I start With planing mode
---> Commit
---> Test
---> Execute
+/////////////////////////////////////////////////////////////////////////////
+𝗧𝗟;𝗗𝗥:
+LLMs are stateless. Output quality depends on context quality.
+My workflow starts like this:
+👉 First of all I start by knowing what I need to build (Authentication feature). 
+👉 I create PLAN.md where I put all details of the feature like (hashtag#Task, hashtag#Rules, hashtag#Instructions, ...)] and then I asked claude or chatgpt for format the file.
+👉 I pick the context that the Agent needs (basically files that need to be created or updated, some images for inspiration)
+👉 I give Plan.md and Context to the Agents
+At the end I verify the implementation test it, and maybe catch some errors.
 
 
-- I Validate requirements
-- I Pick a Plan in ReadMe File (Plan.md)
-- I Give AI Context + Plan
-- I very Implmentation
-- Start Catching Errors and Bugs
-- I Do One Step at a Time: Feed one step of the plan to the AI, test the code, save it with Git, and then move to the next step.
 
-// Tips that I use:
--- I use AGENTS.md: (AGENTS.md in root folder)
-    - File That conver behavior and how AI should do and what in most not do.
-    - This AGENTS.md file is used in every task. like global instructions.
-    - AI coding sessions from 20–40 minutes to under 2 minutes.
-    - explanation of project structure (wich parts are stable, parts are under development)
-    - coding style, patterns, varaible naming, ...
-    - never inline style, ...
-- I Use SKILL.md (.skills/database-migration/SKILL.md)
-    - file that contain tools and skills that AI should use. when it needed
-    - Example: how to do migrations when prisma.schema is updated, use this commands.
-
-- Clear Conversion after each small task - AI Agent stay Smart
-- I use The 40% RUle: I give AI Context + Plan (I Recheck the plan after write it).
-- I use automated linters and compilers to catch typos
-- I Do Not MCP protocol so much to give AI.
-
-
-The hard part was never typing. It's thinking, operational knowledge, and knowing what to build.
 
 
 // SRCs:
