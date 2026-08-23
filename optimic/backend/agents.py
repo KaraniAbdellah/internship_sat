@@ -6,7 +6,7 @@ from langchain.messages import AIMessage, HumanMessage, SystemMessage
 from langgraph.checkpoint.memory import InMemorySaver
 
 
-from state import MarketingState
+from state import MarketingState, ValidationResult
 from state import GENERATION_PROMPT
 from state import OPTIMISATION_PROMPT
 from state import VALIDATION_PROMPT
@@ -64,6 +64,7 @@ async def validation_agent(state: MarketingState):
     print("Validation Agent ...")
     offre = state.get("offre", "no offre")
     offre_rules = state.get("offre_rules", "no offre polices")
+    validation_llm = fast_llm.with_structured_output(ValidationResult)
     messages = [SystemMessage(content=VALIDATION_PROMPT), HumanMessage(content=
         f"""
         Offre: \n\n
@@ -73,8 +74,13 @@ async def validation_agent(state: MarketingState):
         """
     )]
 
-    validation_feedback = await fast_llm.ainvoke(messages)
-    return {"validation_feedback": validation_feedback.content, "next": "OPTIMISATION"}
+    result = await validation_llm.ainvoke(messages)
+    print("Validation Feedback: ", result.validation)
+    print("Validation Description: ", result.description)
+    if (result.validation):
+        return {"validation_feedback": result, "next": "END"}
+    else:
+        return {"validation_feedback": result, "next": "OPTIMISATION"}
 
 
 # Optimisation Agent

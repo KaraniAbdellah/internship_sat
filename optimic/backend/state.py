@@ -14,6 +14,7 @@ from typing import Annotated
 # # Prompt Caching
 from langchain_core.globals import set_llm_cache
 from langchain_community.cache import InMemoryCache
+from pydantic import BaseModel
 
 
 set_llm_cache(InMemoryCache())
@@ -25,7 +26,7 @@ TAVILY_API_KEY = os.getenv("TAVILY_API_KEY")
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 
 # Define LLM
-fast_llm = ChatGroq(model="allam-2-7b", api_key = GROQ_API_KEY, temperature=0.3)
+fast_llm = ChatGroq(model="openai/gpt-oss-20b", api_key = GROQ_API_KEY, temperature=0.3)
 # fast_llm = ChatGoogleGenerativeAI(
 #     model="gemini-3.5-flash",
 #     temperature=0.5,
@@ -48,16 +49,21 @@ fast_llm = ChatGroq(model="allam-2-7b", api_key = GROQ_API_KEY, temperature=0.3)
         canopylabs/orpheus-v1-english
 """
 
-# State Definition    
+# State Definition 
+class ValidationResult(BaseModel):
+    validation: bool
+    description: str
+
 class MarketingState(TypedDict):
     offre_rules: str
     customer_data: str
     score: str
     offre: str
-    validation_feedback: str
+    validation_feedback: ValidationResult
     optimized_offre: str
     next: Literal["SCORING", "GENERATION", "VALIDATION", "OPTIMISATION", "END"]
     messages: Annotated[list, add_messages]
+
 
 
 # Import Prompts

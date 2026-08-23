@@ -42,7 +42,6 @@ def hello_world():
 
 
 
-
 # DATA = Offre + Policies
 @app.post("/generate")
 async def generate_offre(data: Data):
@@ -87,3 +86,9 @@ async def ask_question():
 
 
 
+
+# Email + Offre
+@app.post("/send-offre")
+def send_offre():
+    # Implement the logic to send the offer to the selected customers
+    pass
