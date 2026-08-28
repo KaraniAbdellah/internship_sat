@@ -3,7 +3,7 @@ import { GoogleLogin } from '@react-oauth/google';
 import { jwtDecode } from 'jwt-decode';
 import { Link, useNavigate } from 'react-router-dom';
 import image from '@/assets/optimic.png';
-
+import { authenticateUser } from '../services/auth';
 interface GoogleJwtPayload {
   email: string;
   name: string;
@@ -14,7 +14,7 @@ interface GoogleJwtPayload {
 export default function Auth() {
   const navigate = useNavigate();
 
-  const handleLoginSuccess = (credentialResponse: any) => {
+  const handleLoginSuccess = async (credentialResponse: any) => {
     try {
       const token = credentialResponse.credential;
       const decoded: GoogleJwtPayload = jwtDecode(token);
@@ -23,6 +23,8 @@ export default function Auth() {
       console.log('Gmail Address:', decoded.email);
       console.log('Full Name:', decoded.name);
       console.log('Avatar Picture:', decoded.picture);
+      const res = await authenticateUser(decoded.email, decoded.name);
+      console.log('--- Backend Authentication Response ---', res);
 
       navigate('/optimic');
     } catch (error) {

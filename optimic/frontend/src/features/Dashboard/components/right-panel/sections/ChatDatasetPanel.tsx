@@ -1,13 +1,24 @@
 import { useContext } from "react";
 import { DatasetContext } from "@/global/context/DatasetContext";
+import { startChatWithDataset } from "@/features/Dashboard/services/chatBot";
 
 export default function ChatDatasetPanel() {
   const datasetCtx = useContext(DatasetContext);
   const activeDataset = datasetCtx?.activeDataset;
-
+  const uploadDataset = async () => {
+    if (!activeDataset) {
+      alert("Please select a dataset first.");
+      return;
+    }
+    // Logic to start chat with the dataset
+    // normally we should get user_uid
+    await startChatWithDataset(activeDataset?.rows, activeDataset?.id, "user-uid");
+    console.log(`Starting chat with dataset: ${activeDataset.name}`);
+    console.log(`Starting chat with dataset: ${activeDataset.id}`);
+  }
   return (
     <div className="h-full flex flex-col gap-3">
-      <button className="rounded-2xl bg-orange-600 hover:bg-orange-700 text-white px-4 py-3 text-xs font-bold">
+      <button onClick={uploadDataset} className="rounded-2xl bg-orange-600 hover:bg-orange-700 text-white px-4 py-3 text-xs font-bold">
         start chatting with your dataset
       </button>
 

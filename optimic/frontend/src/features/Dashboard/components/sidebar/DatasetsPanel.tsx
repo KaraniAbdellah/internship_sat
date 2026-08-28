@@ -90,7 +90,7 @@ export default function DatasetsPanel({ isCollapsed }: DatasetsPanelProps) {
         datasets={datasets}
         activeDatasetId={activeDataset?.id ?? null}
         isCollapsed={isCollapsed}
-        canDelete={datasets.length > 1}
+        canDelete={datasets.length >= 1}
         onSelect={handleSelectDataset}
         onDelete={handleDeleteDataset}
       />

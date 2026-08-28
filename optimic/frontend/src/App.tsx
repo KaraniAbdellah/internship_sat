@@ -16,6 +16,8 @@ import { DatasetType } from "./global/types/DatasetType";
 import { CustomerDataType } from "./global/types/CustomerDataType";
 import { OfferResultContext } from "./global/context/OfferResultContext";
 import { OfferResultType } from "./global/types/OfferResultType";
+import { UserDataType } from "./global/types/UserDataType";
+import UserDataContext from "./global/context/UserDataContext";
 
 function App() {
   const [datasets, setDatasets] = useState<DatasetType[]>([]);
@@ -25,9 +27,11 @@ function App() {
   );
   const [offreResult, setOffreResult] = useState<OfferResultType[]>([]);
   const [isGenerated, setIsGenerated] = useState<boolean>(false);
+  const [userData, setUserData] = useState<UserDataType[]>([]);
 
   return (
     <BrowserRouter>
+    <UserDataContext.Provider value={{ user_data: userData, setUserData }}>
       <DatasetContext.Provider
         value={{ datasets, setDatasets, activeDataset, setActiveDataset }}
       >
@@ -76,6 +80,7 @@ function App() {
           </OfferResultContext.Provider>
         </CustomerDataContext.Provider>
       </DatasetContext.Provider>
+    </UserDataContext.Provider>
     </BrowserRouter>
   );
 }
