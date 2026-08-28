@@ -1,5 +1,5 @@
 # Import packages
-from fastapi import FastAPI
+from fastapi import FastAPI, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
@@ -16,10 +16,26 @@ class Data(BaseModel):
     policies: str = "no offre polices"
     thread_id: str = "thread-1"
 
+# Define Data Chat Model
+class UploadData(BaseModel):
+    rows: list = []
+    id: str = "no id"
+    thread_id: str = "thread-1"
+
+# Define Data Chat Model
+class ChatData(BaseModel):
+    question: str = "no question"
+    thread_id: str = "thread-1"
+    dataset_id: str = "no dataset id"
+
+# User Model
+class UserData(BaseModel):
+    email: str = "no email"
+    name: str = "no full name"
 
 # define origins
 origins = [
-    "http://localhost:5173",
+    "http://127.0.0.1:5173",
     "https://internship-sat.vercel.app",
 ]
 
@@ -39,6 +55,26 @@ graph = compile_state_graph()
 @app.get("/")
 def hello_world():
     return {"message": "Hello, World!"}
+
+
+# # Middlware check for user authentication
+# @app.middleware("http")
+# async def check_auth(request, call_next):
+#     # Implement the logic to check if the user is authenticated
+#     # For example, you can check for a valid session or token in the request
+#     # If the user is not authenticated, return an error response
+#     # If the user is authenticated, proceed with the request
+#     pass
+
+
+# Authenticate User
+@app.post("/authenticate")
+def authenticate_user(user_data: UserData):
+    # Implement the logic to authenticate the user
+    print(f"Authenticating user: {user_data.email}, {user_data.name}")
+    # generate a token or session for the user (this is just a placeholder)
+    # store session in cookie for future requests (this is just a placeholder)
+    return {"message": "User authenticated successfully."}
 
 
 
@@ -71,11 +107,17 @@ async def analyse():
     return {"message": "Analyse endpoint not implemented yet."}
 
 
-# start chat with the dataset
-@app.post("/start-chat")
-async def start_chat():
+# Upload Dataset
+@app.post("/upload-dataset")
+async def upload_dataset(dataUploaded: UploadData):
+    print(dataUploaded.rows)
+    print(dataUploaded.id)
+    print(dataUploaded.thread_id)
     # Rag Model to start chat with the dataset
+    # We Process data
+    # Store Data Into Vector Database With Specific User ID
     pass
+
 
 
 # start ask next question to the dataset
