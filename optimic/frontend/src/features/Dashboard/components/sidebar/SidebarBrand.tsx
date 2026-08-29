@@ -1,5 +1,6 @@
 import persona_icon from "@/assets/persona_icon.png";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Link } from "react-router-dom";
 
 type SidebarBrandProps = {
   isCollapsed: boolean;
@@ -23,9 +24,11 @@ export default function SidebarBrand({
           className="w-11 h-11 object-contain shrink-0"
         />
         {!isCollapsed && (
-          <span className="text-xl font-bold text-slate-900 tracking-tight whitespace-nowrap">
-            Optimic.
-          </span>
+          <Link to="/" className="flex items-center gap-2.5 group">
+            <span className="text-xl hover:text-[#f54a00] cursor-pointer transition-colors font-bold text-slate-900 tracking-tight whitespace-nowrap">
+              Optimic.
+            </span>
+          </Link>
         )}
       </div>
 

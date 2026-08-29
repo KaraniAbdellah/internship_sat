@@ -1,46 +1,22 @@
-# Import packages
-from fastapi import FastAPI, UploadFile
+from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-# Import state
-from state import MarketingState
-
-# Import graph and agents
+from auth import create_token, get_or_create_user, verify_token
+from models.models import MarketingData, UploadData, ChatData, UserData
+from auth import TOKEN_EXPIRE_DAYS 
 from agents import compile_state_graph
 
 
-# Define Data Models
-class Data(BaseModel):
-    customer_data: str = "no customer data"
-    policies: str = "no offre polices"
-    thread_id: str = "thread-1"
+app = FastAPI()
 
-# Define Data Chat Model
-class UploadData(BaseModel):
-    rows: list = []
-    id: str = "no id"
-    thread_id: str = "thread-1"
-
-# Define Data Chat Model
-class ChatData(BaseModel):
-    question: str = "no question"
-    thread_id: str = "thread-1"
-    dataset_id: str = "no dataset id"
-
-# User Model
-class UserData(BaseModel):
-    email: str = "no email"
-    name: str = "no full name"
-
-# define origins
+# Allow credentials for cookie transmission
 origins = [
+    "http://localhost:5173",
     "http://127.0.0.1:5173",
     "https://internship-sat.vercel.app",
 ]
 
-# Start Point
-app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -52,35 +28,78 @@ app.add_middleware(
 # Define Graph
 graph = compile_state_graph()
 
+
+# Global Auth Middleware
+@app.middleware("http")
+async def authentication_middleware(request: Request, call_next):
+    # Endpoints that bypass authentication
+    public_paths = {"/", "/authenticate", "/docs", "/openapi.json"}
+
+    if request.url.path in public_paths or request.method == "OPTIONS":
+        return await call_next(request)
+
+    token = request.cookies.get("auth_token")
+
+    if not token:
+        return Response(
+            content='{"detail":"Authentication required"}',
+            status_code=401,
+            media_type="application/json",
+        )
+
+    try:
+        user = verify_token(token)
+    except Exception as e:
+        return Response(
+            content=f'{{"detail":"{str(e)}"}}',
+            status_code=401,
+            media_type="application/json",
+        )
+
+    # Attach user to request state
+    request.state.user = user
+    return await call_next(request)
+
+
+# Public Routes
 @app.get("/")
 def hello_world():
-    return {"message": "Hello, World!"}
+    return {"message": "Server is running"}
 
 
-# # Middlware check for user authentication
-# @app.middleware("http")
-# async def check_auth(request, call_next):
-#     # Implement the logic to check if the user is authenticated
-#     # For example, you can check for a valid session or token in the request
-#     # If the user is not authenticated, return an error response
-#     # If the user is authenticated, proceed with the request
-#     pass
 
-
-# Authenticate User
 @app.post("/authenticate")
-def authenticate_user(user_data: UserData):
-    # Implement the logic to authenticate the user
-    print(f"Authenticating user: {user_data.email}, {user_data.name}")
-    # generate a token or session for the user (this is just a placeholder)
-    # store session in cookie for future requests (this is just a placeholder)
-    return {"message": "User authenticated successfully."}
+def authenticate_user(user_data: UserData, response: Response):
+    user = get_or_create_user(user_data.email, user_data.name)
+    token = create_token(user)
+
+    # Set cookie (use samesite="none" & secure=True for HTTPS / Cross-domain production)
+    response.set_cookie(
+        key="auth_token",
+        value=token,
+        httponly=True,
+        secure=False,      # Set to True on production HTTPS
+        samesite="lax",    # Set to "none" if frontend & backend are on different domains in production
+        max_age=TOKEN_EXPIRE_DAYS,  # 7 days
+    )
+
+    return {"message": "Authentication successful", "user": user}
 
 
+# Protected Routes
+@app.get("/me")
+def get_me(request: Request):
+    return {"user": request.state.user}
 
-# DATA = Offre + Policies
+
 @app.post("/generate")
-async def generate_offre(data: Data):
+async def generate_offre(data: MarketingData, request: Request):
+    user = request.state.user
+    user_uid = user["uid"]
+    print(f"Generating offer for user {user_uid} with data: {data.dict()}")
+
+    # Scoped execution per user
+    thread_id = f"{user_uid}"
     inputs = {
         "offre_rules": data.policies,
         "customer_data": data.customer_data,
@@ -88,9 +107,10 @@ async def generate_offre(data: Data):
     }
 
     # Thread 1: User Alice
-    config1 = {"configurable": {"thread_id": data.thread_id}}
+    config1 = {"configurable": {"thread_id": thread_id}}
 
     final_state = await graph.ainvoke(inputs, config1)
+    print("Final State:", final_state.get("offre"))
     return {
         "offre_rules": final_state.get("offre_rules"),
         "customer_data": final_state.get("customer_data"),
@@ -100,37 +120,30 @@ async def generate_offre(data: Data):
         "optimized_offre": final_state.get("optimized_offre")
     }
 
-# DATA = Offre + Feedback
-@app.post("/analyse")
-async def analyse():
-    print("Analysing ...")
-    return {"message": "Analyse endpoint not implemented yet."}
+    
 
-
-# Upload Dataset
 @app.post("/upload-dataset")
-async def upload_dataset(dataUploaded: UploadData):
-    print(dataUploaded.rows)
-    print(dataUploaded.id)
-    print(dataUploaded.thread_id)
-    # Rag Model to start chat with the dataset
-    # We Process data
-    # Store Data Into Vector Database With Specific User ID
-    pass
+async def upload_dataset(dataUploaded: UploadData, request: Request):
+    user = request.state.user
+    user_uid = user["uid"]
+
+    return {
+        "status": "Dataset saved in vector database",
+        "user_uid": user_uid,
+        "rows_count": len(dataUploaded.rows),
+    }
 
 
-
-# start ask next question to the dataset
 @app.post("/ask-question")
-async def ask_question():
-    # Rag Model to ask question about the dataset
-    pass
+async def ask_question(data: ChatData, request: Request):
+    user = request.state.user
+    user_uid = user["uid"]
 
-
-
-
-# Email + Offre
-@app.post("/send-offre")
-def send_offre():
-    # Implement the logic to send the offer to the selected customers
-    pass
+    return {
+        "user_uid": user_uid,
+        "question": data.question,
+        "response": "RAG response scoped to user datasets",
+    }
+    
+    
+    
