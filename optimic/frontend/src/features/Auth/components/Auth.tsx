@@ -1,9 +1,9 @@
-import { motion } from 'framer-motion';
-import { GoogleLogin } from '@react-oauth/google';
-import { jwtDecode } from 'jwt-decode';
-import { Link, useNavigate } from 'react-router-dom';
-import image from '@/assets/optimic.png';
-import { authenticateUser } from '../services/auth';
+import { motion } from "framer-motion";
+import { GoogleLogin } from "@react-oauth/google";
+import { jwtDecode } from "jwt-decode";
+import { Link, useNavigate } from "react-router-dom";
+import image from "@/assets/optimic.png";
+import { authenticateUser } from "../services/auth";
 interface GoogleJwtPayload {
   email: string;
   name: string;
@@ -19,16 +19,15 @@ export default function Auth() {
       const token = credentialResponse.credential;
       const decoded: GoogleJwtPayload = jwtDecode(token);
 
-      console.log('--- Google User Profile ---', decoded);
-      console.log('Gmail Address:', decoded.email);
-      console.log('Full Name:', decoded.name);
-      console.log('Avatar Picture:', decoded.picture);
+      console.log("--- Google User Profile ---", decoded);
+      console.log("Gmail Address:", decoded.email);
+      console.log("Full Name:", decoded.name);
+      console.log("Avatar Picture:", decoded.picture);
       const res = await authenticateUser(decoded.email, decoded.name);
-      console.log('--- Backend Authentication Response ---', res);
-
-      navigate('/optimic');
+      console.log("--- Backend Authentication Response ---", res);
+      window.location.href = "/optimic";
     } catch (error) {
-      console.error('Failed to decode Google token', error);
+      console.error("Failed to decode Google token", error);
     }
   };
 
@@ -37,7 +36,11 @@ export default function Auth() {
       {/* Top Bar */}
       <div className="max-w-7xl mx-auto w-full flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2 sm:gap-2.5 group">
-          <img src={image} alt="Optimic Logo" className="h-7 sm:h-8 w-auto object-contain transition-transform group-hover:scale-105" />
+          <img
+            src={image}
+            alt="Optimic Logo"
+            className="h-7 sm:h-8 w-auto object-contain transition-transform group-hover:scale-105"
+          />
           <span className="text-lg sm:text-xl font-black tracking-tight text-slate-900 group-hover:text-[#ff1d00] transition-colors">
             Optimic<span className="text-[#ff1d00]">.</span>
           </span>
@@ -57,14 +60,15 @@ export default function Auth() {
         transition={{ duration: 0.3 }}
         className="max-w-md w-full mx-auto my-auto text-center bg-white p-8 rounded-2xl "
       >
-
         <h1
           style={{ color: "#ff1d00" }}
-          className="text-2xl sm:text-3xl font-bold text-slate-900 mt-4 mb-2">
+          className="text-2xl sm:text-3xl font-bold text-slate-900 mt-4 mb-2"
+        >
           Sign In to Optimic
         </h1>
         <p className="text-slate-500 text-sm mb-8">
-          Continue securely with your <span className="text-zinc-600 font-semibold">Google account.</span>
+          Continue securely with your{" "}
+          <span className="text-zinc-600 font-semibold">Google account.</span>
         </p>
 
         {/* Google Login Button */}
@@ -72,7 +76,7 @@ export default function Auth() {
           <GoogleLogin
             onSuccess={handleLoginSuccess}
             onError={() => {
-              console.error('Google Login Failed');
+              console.error("Google Login Failed");
             }}
             shape="pill"
             size="large"

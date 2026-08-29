@@ -7,6 +7,7 @@ async function startChatWithDataset(rows: string[][], id: string, user_uid: stri
       headers: {
         "Content-Type": "application/json",
       },
+      credentials: "include", // Required to send auth_token cookie
       body: JSON.stringify({ rows, id, user_uid }),
     });
 

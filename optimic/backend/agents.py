@@ -25,7 +25,6 @@ async def scoring_agent(state: MarketingState):
         Customer Data: \n\n
             {customer_data}
         """)]
-    
     score = await fast_llm.ainvoke(messages) # Asynchronously ainvoke
 
     return {

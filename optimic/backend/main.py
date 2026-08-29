@@ -33,7 +33,7 @@ graph = compile_state_graph()
 @app.middleware("http")
 async def authentication_middleware(request: Request, call_next):
     # Endpoints that bypass authentication
-    public_paths = {"/", "/authenticate", "/docs", "/openapi.json"}
+    public_paths = {"/", "/authenticate", "/logout", "/docs", "/openapi.json"}
 
     if request.url.path in public_paths or request.method == "OPTIONS":
         return await call_next(request)
@@ -120,12 +120,18 @@ async def generate_offre(data: MarketingData, request: Request):
         "optimized_offre": final_state.get("optimized_offre")
     }
 
-    
+
 
 @app.post("/upload-dataset")
 async def upload_dataset(dataUploaded: UploadData, request: Request):
     user = request.state.user
     user_uid = user["uid"]
+    print("dataUploaded:", dataUploaded)
+    # Check User UID
+    
+    # Store Datasets Information for the user in a JSON file
+    
+    # Start Processing The Data Into Qdrant Cloud
 
     return {
         "status": "Dataset saved in vector database",
@@ -138,12 +144,26 @@ async def upload_dataset(dataUploaded: UploadData, request: Request):
 async def ask_question(data: ChatData, request: Request):
     user = request.state.user
     user_uid = user["uid"]
-
+    
+    # I need Two Information Dataset and User UID to Scope the RAG Response to the User Datasets
+    
     return {
         "user_uid": user_uid,
         "question": data.question,
         "response": "RAG response scoped to user datasets",
     }
+
     
     
     
+# 2. Add the /logout endpoint
+@app.post("/logout")
+def logout_user(response: Response):
+    # delete_cookie matches the parameters used in set_cookie
+    response.delete_cookie(
+        key="auth_token",
+        httponly=True,
+        secure=False,   # Set to True on production HTTPS
+        samesite="lax", # Set to "none" if cross-domain in production
+    )
+    return {"message": "Logged out successfully"}
