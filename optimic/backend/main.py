@@ -1,12 +1,10 @@
 from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
 
-from auth import create_token, get_or_create_user, verify_token
+from auth import create_token, get_or_create_user, verify_token, delete_user
 from models.models import MarketingData, UploadData, ChatData, UserData
 from auth import TOKEN_EXPIRE_DAYS 
 from agents import compile_state_graph
-
 
 app = FastAPI()
 
@@ -154,11 +152,13 @@ async def ask_question(data: ChatData, request: Request):
     }
 
     
-    
-    
-# 2. Add the /logout endpoint
+
+# Add the /logout endpoint
 @app.post("/logout")
 def logout_user(response: Response):
+    # Delete the auth_token cookie to log the user out
+    delete_user(response.cookies.get("auth_token"))  # Optional: Remove user from auth.json if needed
+    
     # delete_cookie matches the parameters used in set_cookie
     response.delete_cookie(
         key="auth_token",
@@ -167,3 +167,5 @@ def logout_user(response: Response):
         samesite="lax", # Set to "none" if cross-domain in production
     )
     return {"message": "Logged out successfully"}
+
+

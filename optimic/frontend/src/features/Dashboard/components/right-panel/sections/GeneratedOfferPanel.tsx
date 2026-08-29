@@ -29,7 +29,6 @@ export default function GeneratedOfferPanel({
     if (!text) return;
     navigator.clipboard.writeText(text);
     setCopied(true);
-    toast.success("Offer copied to clipboard!");
     setTimeout(() => setCopied(false), 2000);
   };
 

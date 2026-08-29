@@ -86,3 +86,13 @@ def verify_token(token: str) -> dict:
         raise ValueError("Authentication data mismatch")
 
     return user
+
+
+
+def delete_user(uid: str):
+    auth = load_auth()
+    auth["users"] = [u for u in auth["users"] if u["uid"] != uid]
+    save_auth(auth)
+
+
+
