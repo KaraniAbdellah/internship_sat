@@ -104,8 +104,38 @@ def initialize_chatbot(user_uid: str):
 
 
 # Preprocessing
-def process_data_into_qdrant(rows: list, dataset_uid: str, user_uid: str):
-    pass
+def add_doc_qdrant_cloud(rows: str, payload: dict, user_uid: str):
+    len_rows = len(rows)
+    STEP = 500
+    for i in range(0, len_rows, STEP):
+        chunk = rows[i:i + STEP]
+        print(f"Adding chunk to Qdrant Cloud: {chunk}")
+        # Here you would add the logic to insert the chunk into Qdrant Cloud
+        client_qdrant.upsert(
+            collection_name=COLLECTION_NAME,
+            points=[
+                models.PointStruct(
+                    id=1,
+                    payload=payload,
+                    vector=[0.9, 0.1, 0.1],
+                ),
+            ],
+            shard_key_selector=models.ShardKeyWithFallback(
+                target="user_1",
+                fallback="default"
+            )
+        )
+
+
+def process_data_into_qdrant(rows: list[list[str]], dataset_id: str, user_uid: str):
+    print("Processing data into Qdrant...")
+    rows = str(rows)
+    payload = {
+        "dataset_id": dataset_id,
+        "user_uid": user_uid
+    }
+    add_doc_qdrant_cloud(rows, payload, user_uid)
+
 
 
 # Store Chunks Into Qdrant Cloud with MetaData (Dataset_uid and User_uid)
