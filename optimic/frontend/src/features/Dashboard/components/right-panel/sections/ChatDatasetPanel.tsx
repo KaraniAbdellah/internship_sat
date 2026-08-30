@@ -14,21 +14,36 @@ export default function ChatDatasetPanel() {
     }
     // Logic to start chat with the dataset
     // normally we should get user_uid
-    
+
     const userUid = user?.user_data?.uid;
-    await startChatWithDataset(activeDataset?.rows, activeDataset?.id, userUid);
+    await startChatWithDataset(
+      activeDataset?.rows,
+      activeDataset?.id,
+      activeDataset.name,
+      activeDataset.isActive,
+      userUid,
+    );
+
+    // Update the state to indicate that the chat has started
+    datasetCtx?.setActiveDataset({ ...activeDataset, isActive: true });
+
+    // Update also the IndexDB to reflect the change in the dataset's active status
+
     console.log(`Starting chat with dataset: ${activeDataset.name}`);
     console.log(`Starting chat with dataset: ${activeDataset.id}`);
-  }
+  };
   return (
     <div className="h-full flex flex-col gap-3">
-      <button onClick={uploadDataset} className="rounded-2xl bg-orange-600 hover:bg-orange-700 text-white px-4 py-3 text-xs font-bold">
+      <button
+        onClick={uploadDataset}
+        className="rounded-2xl bg-orange-600 hover:bg-orange-700 text-white px-4 py-3 text-xs font-bold"
+      >
         start chatting with your dataset
       </button>
 
       <div className="rounded-2xl border border-slate-200 bg-white p-3 text-xs text-slate-800 font-semibold leading-relaxed">
-        Connect to {activeDataset?.name || "your dataset"} and ask anything about
-        trends, totals, or customer segments.
+        Connect to {activeDataset?.name || "your dataset"} and ask anything
+        about trends, totals, or customer segments.
       </div>
 
       <div className="self-end rounded-2xl bg-slate-900 text-white px-4 py-3 text-xs font-semibold max-w-[90%]">
@@ -36,8 +51,8 @@ export default function ChatDatasetPanel() {
       </div>
 
       <div className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-xs text-slate-800 font-semibold leading-relaxed">
-        Based on the current sample, the strongest spend cluster appears around high-value
-        urban records.
+        Based on the current sample, the strongest spend cluster appears around
+        high-value urban records.
       </div>
 
       <div className="mt-auto flex items-center gap-2">

@@ -9,8 +9,10 @@ class MarketingData(BaseModel):
 # Define Data Chat Model
 class UploadData(BaseModel):
     rows: list = []
-    id: str = "no id"
-    thread_id: str = "thread-1"
+    dataset_name: str = "no name"
+    dataset_id: str = "no id"
+    user_uid: str = "thread-1"
+    is_active: bool = False
 
 # Define Data Chat Model
 class ChatData(BaseModel):
@@ -22,3 +24,4 @@ class ChatData(BaseModel):
 class UserData(BaseModel):
     email: str = "no email"
     name: str = "no full name"
+    user_uid: str = "no uid"

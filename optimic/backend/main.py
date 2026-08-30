@@ -5,7 +5,7 @@ from auth import create_token, get_or_create_user, verify_token, delete_user
 from models.models import MarketingData, UploadData, ChatData, UserData
 from auth import TOKEN_EXPIRE_DAYS 
 from agents import compile_state_graph
-from chatbot import create_shared_collection
+from chatbot import check_dataset_exists, get_user_dataset_record, initialize_chatbot, process_data_into_qdrant, add_user_dataset_record
 
 app = FastAPI()
 
@@ -120,29 +120,40 @@ async def generate_offre(data: MarketingData, request: Request):
     }
 
 
-
 @app.post("/upload-dataset")
 async def upload_dataset(dataUploaded: UploadData, request: Request):
-    user = request.state.user
-    print(f"Uploading dataset for user {user['uid']} with data: {dataUploaded.dict()}")
-    user_uid = user["uid"]
-    print("dataUploaded:", dataUploaded)
-    # Check User UID
-    if (user_uid != dataUploaded.user_uid):
-        raise HTTPException(status_code=403, detail="User UID mismatch")
+    user_uid = request.state.user.get("uid") or request.state.user.get("sub")
+    dataset_id = dataUploaded.dataset_id
+    dataset_name = dataUploaded.dataset_name
+    is_active = dataUploaded.is_active
+    rows = dataUploaded.rows
+
+    # 0.0: Check if dataset is already registered for this user
+    user_exit = get_user_dataset_record(user_uid, dataset_id)
+    print("Already exists:", user_exit)
     
-    # Create Shard for new user
-    create_shared_collection(user_uid)
+    # 0.1: if Dataset Already Exists for the User, Return a Message
+    if user_exit:
+        dataset_exit = check_dataset_exists(user_uid, dataset_id)
+        print("Dataset Already Exists for the User:", dataset_exit)
+        if dataset_exit:
+            return {
+                "status": "Dataset already exists for this user",
+            }
     
+    # 1. Add User In the Registry File
+    add_user_dataset_record(user_uid, dataset_name, dataset_id)
     
-    # Start Processing The Data Into Qdrant Cloud
+    # 2: Initialize Qdrant Collection for the User
+    initialize_chatbot(user_uid)
+    
+    # 3: Process Data into Qdrant
+    process_data_into_qdrant(rows, dataset_id, user_uid)
 
     return {
         "status": "Dataset saved in vector database",
-        "user_uid": user_uid,
-        "rows_count": len(dataUploaded.rows),
     }
-
+    
 
 @app.post("/ask-question")
 async def ask_question(data: ChatData, request: Request):
