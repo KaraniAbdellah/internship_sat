@@ -1,10 +1,11 @@
-from fastapi import FastAPI, Request, Response
+from fastapi import FastAPI, Request, Response, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
 from auth import create_token, get_or_create_user, verify_token, delete_user
 from models.models import MarketingData, UploadData, ChatData, UserData
 from auth import TOKEN_EXPIRE_DAYS 
 from agents import compile_state_graph
+from chatbot import create_shared_collection
 
 app = FastAPI()
 
@@ -123,11 +124,16 @@ async def generate_offre(data: MarketingData, request: Request):
 @app.post("/upload-dataset")
 async def upload_dataset(dataUploaded: UploadData, request: Request):
     user = request.state.user
+    print(f"Uploading dataset for user {user['uid']} with data: {dataUploaded.dict()}")
     user_uid = user["uid"]
     print("dataUploaded:", dataUploaded)
     # Check User UID
+    if (user_uid != dataUploaded.user_uid):
+        raise HTTPException(status_code=403, detail="User UID mismatch")
     
-    # Store Datasets Information for the user in a JSON file
+    # Create Shard for new user
+    create_shared_collection(user_uid)
+    
     
     # Start Processing The Data Into Qdrant Cloud
 
@@ -157,7 +163,9 @@ async def ask_question(data: ChatData, request: Request):
 @app.post("/logout")
 def logout_user(response: Response):
     # Delete the auth_token cookie to log the user out
-    delete_user(response.cookies.get("auth_token"))  # Optional: Remove user from auth.json if needed
+    print(type(response))
+    print(response.headers)
+    response.set_cookie("auth_token", "", max_age=0, httponly=True, secure=False, samesite="lax")
     
     # delete_cookie matches the parameters used in set_cookie
     response.delete_cookie(

@@ -28,7 +28,7 @@ function App() {
   const [customerData, setCustomerData] = useState<CustomerDataType[]>([]);
   const [offreResult, setOffreResult] = useState<OfferResultType[]>([]);
   const [isGenerated, setIsGenerated] = useState<boolean>(false);
-  const [userData, setUserData] = useState<UserDataType[]>([]);
+  const [userData, setUserData] = useState<UserDataType | null>(null);
 
   // Auth check states
   const [isLoadingAuth, setIsLoadingAuth] = useState<boolean>(true);
@@ -45,7 +45,7 @@ function App() {
 
         if (response.ok) {
           const data = await response.json();
-          setUserData([data.user]);
+          setUserData(data.user);
           setIsAuthenticated(true);
         } else {
           setIsAuthenticated(false);

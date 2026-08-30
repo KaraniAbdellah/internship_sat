@@ -4,15 +4,17 @@ import { jwtDecode } from "jwt-decode";
 import { Link, useNavigate } from "react-router-dom";
 import image from "@/assets/optimic.png";
 import { authenticateUser } from "../services/auth";
+import { useContext } from "react";
 interface GoogleJwtPayload {
   email: string;
   name: string;
   picture: string;
   sub: string;
 }
+import UserDataContext from "@/global/context/UserDataContext";
 
 export default function Auth() {
-  const navigate = useNavigate();
+  const userContext = useContext(UserDataContext);
 
   const handleLoginSuccess = async (credentialResponse: any) => {
     try {
@@ -24,6 +26,12 @@ export default function Auth() {
       console.log("Full Name:", decoded.name);
       console.log("Avatar Picture:", decoded.picture);
       const res = await authenticateUser(decoded.email, decoded.name);
+      // Set Context
+      userContext.setUserData({
+        email: decoded.email,
+        full_name: decoded.name,
+        uid: res.user.uid
+      });
       console.log("--- Backend Authentication Response ---", res);
       window.location.href = "/optimic";
     } catch (error) {

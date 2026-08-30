@@ -2,6 +2,7 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000"; //
 async function startChatWithDataset(rows: string[][], id: string, user_uid: string) {
     console.log("type of sending data:", typeof JSON.stringify({ rows }));
   try {
+    console.log("Sending data to backend:", { rows, id, user_uid });  
     const response = await fetch(`${API_BASE_URL}/upload-dataset`, {
       method: "POST",
       headers: {
