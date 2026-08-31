@@ -166,10 +166,8 @@ async def ask_question(data: ChatData, request: Request):
     answer = get_response_from_qdrant(user_uid, dataset_id, question)
 
     return {
-        "user_uid": user_uid,
         "question": data.question,
         "response": answer,
-        "dataset_id": dataset_id,
     }
 
     

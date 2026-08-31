@@ -35,7 +35,7 @@ export default function GeneratedOfferPanel({
   const sendOffre = () => {
     // Implement the logic to send the offer to the selected customers
     // This could involve calling an API endpoint or performing some action
-    toast.success(`Offer sent to ${selectedCount} customers!`);
+    toast.success(`Comming Soon ...`);
     
   }
 

@@ -1,7 +1,7 @@
 import { DatasetType } from "@/global/types/DatasetType";
 import { DB_CONFIG } from "../constants/conts";
 
-function openDatabase(): Promise<IDBDatabase> {
+export const openDatabase = (): Promise<IDBDatabase> => {
   return new Promise((resolve, reject) => {
     const request = indexedDB.open(DB_CONFIG.NAME, DB_CONFIG.VERSION);
 

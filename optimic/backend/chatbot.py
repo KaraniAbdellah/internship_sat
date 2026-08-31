@@ -14,6 +14,9 @@ from langchain_core.messages import SystemMessage, HumanMessage
 
 
 # Load environment variables
+f = open("./prompts/chatbot.md")
+CHATBOT_PROMPT = f.read()
+f.close()
 config = dotenv_values(".env")
 QDRANT_CLOUD_API_KEY = config.get("QDRANT_CLOUD_API_KEY")
 QDRANT_CLOUD_ENDPOINT = config.get("QDRANT_CLOUD_ENDPOINT")
@@ -189,12 +192,12 @@ def process_data_into_qdrant(rows: list[list[str]], dataset_id: str, user_uid: s
 
 
 
-
 # 1. Retrieve relevant chunks using shard_key routing and dataset_id filtering
 def get_relevant_chunks_from_qdrant(question: str, dataset_uid: str, user_uid: str, limit: int = 5) -> str:
     try:
         results = client_qdrant.query_points(
             collection_name=COLLECTION_NAME,
+            
             # Multi-tenant isolation: routes strictly to the user's logical shard
             shard_key_selector=user_uid,
             
@@ -227,6 +230,7 @@ def get_relevant_chunks_from_qdrant(question: str, dataset_uid: str, user_uid: s
                     limit=limit * 2,
                 ),
             ],
+            
             query=FusionQuery(fusion=models.Fusion.RRF),
             limit=limit,
         )
@@ -243,7 +247,7 @@ def get_relevant_chunks_from_qdrant(question: str, dataset_uid: str, user_uid: s
                 chunks.append(content)
 
         if not chunks:
-            return "لا توجد سجلات مطابقة في هذا الجدول."
+            return "No relevant chunks found."
 
         return "\n".join(f"- {chunk}" for chunk in chunks)
 
@@ -254,15 +258,15 @@ def get_relevant_chunks_from_qdrant(question: str, dataset_uid: str, user_uid: s
 
 # 2. Generate Answer based on Context and Prompt
 def generate_response(question: str, context: str) -> str:
-    sys_prompt = f"""
-       Give Response Based on the following context and question.
-       Context: {context}
-       Question: {question}
+    sys_prompt = CHATBOT_PROMPT
+    message = f"""
+        Question: {question}
+        Context: {context}
     """
 
     messages = [
         SystemMessage(content=sys_prompt),
-        HumanMessage(content=question),
+        HumanMessage(content=message),
     ]
 
     # Stream chunks from LangChain LLM and aggregate

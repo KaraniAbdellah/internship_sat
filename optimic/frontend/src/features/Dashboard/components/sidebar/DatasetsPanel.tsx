@@ -37,6 +37,7 @@ export default function DatasetsPanel({ isCollapsed }: DatasetsPanelProps) {
         rows,
         rowCount: rows.length,
         policy: "",
+        isActive: false,
         createdAt: Date.now(),
       };
 

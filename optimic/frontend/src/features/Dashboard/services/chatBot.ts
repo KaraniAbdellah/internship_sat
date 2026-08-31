@@ -1,3 +1,7 @@
+import { DatasetType } from "@/global/types/DatasetType";
+import { DB_CONFIG } from "../constants/conts";
+import { openDatabase } from "./datasetDb";
+
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000"; // Replace with your backend API base URL
 async function startChatWithDataset(
   rows: string[][],
@@ -41,16 +45,41 @@ async function askQuestion(question: string, user_uid: string, dataset_id: strin
       headers: {
         "Content-Type": "application/json",
       },
-      credentials: "include", // Required to send auth_token cookie
+      credentials: "include",
       body: JSON.stringify({ question, user_uid, dataset_id }),
     });
-    const data = await response.json();
-    console.log("Question asked successfully:", data);
+
+    if (!response.ok) {
+      throw new Error(`Server returned ${response.status}`);
+    }
+
+    const data: { question: string; response: string } = await response.json();
+    return data;
   } catch (error) {
     console.error("Error asking question:", error);
+    throw error;
   }
+}
+async function makeDatasetActive(datasetId: string): Promise<void> {
+  const db = await openDatabase();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(DB_CONFIG.STORE, "readwrite");
+    const store = tx.objectStore(DB_CONFIG.STORE);
+    const getReq = store.get(datasetId);
+
+    getReq.onsuccess = () => {
+      const record: DatasetType = getReq.result;
+      if (record) {
+        record.isActive = true;
+        store.put(record);
+      }
+    };
+
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
 }
 
 
 
-export { startChatWithDataset, askQuestion };
+export { startChatWithDataset, askQuestion, makeDatasetActive };
