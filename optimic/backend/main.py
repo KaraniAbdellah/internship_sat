@@ -5,7 +5,7 @@ from auth import create_token, get_or_create_user, verify_token, delete_user
 from models.models import MarketingData, UploadData, ChatData, UserData
 from auth import TOKEN_EXPIRE_DAYS 
 from agents import compile_state_graph
-from chatbot import check_dataset_exists, get_user_dataset_record, initialize_chatbot, process_data_into_qdrant, add_user_dataset_record
+from chatbot import check_dataset_exists, get_user_dataset_record, initialize_chatbot, process_data_into_qdrant, add_user_dataset_record, get_response_from_qdrant
 
 app = FastAPI()
 
@@ -131,7 +131,7 @@ async def upload_dataset(dataUploaded: UploadData, request: Request):
     # 0.0: Check if dataset is already registered for this user
     user_exit = get_user_dataset_record(user_uid, dataset_id)
     print("Already exists:", user_exit)
-    
+
     # 0.1: if Dataset Already Exists for the User, Return a Message
     if user_exit:
         dataset_exit = check_dataset_exists(user_uid, dataset_id)
@@ -140,32 +140,36 @@ async def upload_dataset(dataUploaded: UploadData, request: Request):
             return {
                 "status": "Dataset already exists for this user",
             }
-    
+
     # 1. Add User In the Registry File
     add_user_dataset_record(user_uid, dataset_name, dataset_id)
-    
+
     # 2: Initialize Qdrant Collection for the User
     initialize_chatbot(user_uid)
-    
+
     # 3: Process Data into Qdrant
     process_data_into_qdrant(rows, dataset_id, user_uid)
 
     return {
         "status": "Dataset saved in vector database",
+        "dataset_id": dataset_id,
     }
-    
+
 
 @app.post("/ask-question")
 async def ask_question(data: ChatData, request: Request):
     user = request.state.user
     user_uid = user["uid"]
+    dataset_id = data.dataset_id
+    question = data.question
     
-    # I need Two Information Dataset and User UID to Scope the RAG Response to the User Datasets
-    
+    answer = get_response_from_qdrant(user_uid, dataset_id, question)
+
     return {
         "user_uid": user_uid,
         "question": data.question,
-        "response": "RAG response scoped to user datasets",
+        "response": answer,
+        "dataset_id": dataset_id,
     }
 
     

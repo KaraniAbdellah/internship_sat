@@ -1,6 +1,9 @@
 import { useContext } from "react";
 import { DatasetContext } from "@/global/context/DatasetContext";
-import { startChatWithDataset } from "@/features/Dashboard/services/chatBot";
+import {
+  askQuestion,
+  startChatWithDataset,
+} from "@/features/Dashboard/services/chatBot";
 import UserDataContext from "@/global/context/UserDataContext";
 
 export default function ChatDatasetPanel() {
@@ -32,6 +35,20 @@ export default function ChatDatasetPanel() {
     console.log(`Starting chat with dataset: ${activeDataset.name}`);
     console.log(`Starting chat with dataset: ${activeDataset.id}`);
   };
+
+  const handleAskQuestion = async (question: string) => {
+    if (!activeDataset) {
+      alert("Please select a dataset first.");
+      return;
+    }
+    try {
+      const userUid = user?.user_data?.uid;
+      const datasetId = activeDataset?.id;
+      const response = await askQuestion(question, userUid, datasetId);
+    } catch (error) {
+      console.error("Error asking question:", error);
+    }
+  };
   return (
     <div className="h-full flex flex-col gap-3">
       <button
@@ -62,6 +79,7 @@ export default function ChatDatasetPanel() {
           className="flex-1 h-10 px-3 rounded-xl border border-slate-200 bg-white text-xs focus:outline-none focus:ring-2 focus:ring-orange-500/20"
         />
         <button
+          onClick={() => handleAskQuestion("What is bext email format here?")}
           type="button"
           className="h-10 px-4 rounded-xl bg-orange-600 hover:bg-orange-700 text-white text-xs font-bold"
         >

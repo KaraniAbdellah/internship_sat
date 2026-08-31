@@ -4,7 +4,7 @@ from pydantic import BaseModel
 class MarketingData(BaseModel):
     customer_data: str = "no customer data"
     policies: str = "no offre polices"
-    thread_id: str = "thread-1"
+    user_uid: str = "thread-1"
 
 # Define Data Chat Model
 class UploadData(BaseModel):
@@ -17,7 +17,7 @@ class UploadData(BaseModel):
 # Define Data Chat Model
 class ChatData(BaseModel):
     question: str = "no question"
-    thread_id: str = "thread-1"
+    user_uid: str = "thread-1"
     dataset_id: str = "no dataset id"
 
 # User Model

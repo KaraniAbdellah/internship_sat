@@ -1,9 +1,11 @@
 [
   {
     "user_uid": "93531137-b624-4894-99c0-167b652e3bb2",
-    "datasets": {
-      "dataset_name": "Customer-Purchase-History.csv",
-      "dataset_id": "ds_1787951564921"
-    }
+    "datasets": [
+      {
+        "dataset_name": "emails.csv",
+        "dataset_id": "ds_1788189740232"
+      }
+    ]
   }
 ]
