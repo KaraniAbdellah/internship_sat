@@ -52,15 +52,14 @@ def get_user_dataset_record(user_uid: str, dataset_id: str) -> bool:
                 return False
 
             return any(
-                record.get("user_uid") == user_uid and
-                any(d.get("dataset_id") == dataset_id for d in record.get("datasets", []))
+                record.get("user_uid") == user_uid
                 for record in records
             )
     except (json.JSONDecodeError, OSError):
         return False
 
 
-def check_dataset_exists(user_uid: str, dataset_id: str) -> bool:
+def check_dataset_exists(user_uid: str, dataset_name: str) -> bool:
     """Check if the dataset exists for the given user."""
     if not os.path.exists(REGISTRY_PATH):
         return False
@@ -74,7 +73,7 @@ def check_dataset_exists(user_uid: str, dataset_id: str) -> bool:
             for record in records:
                 if record.get("user_uid") == user_uid:
                     datasets = record.get("datasets", [])
-                    return any(d.get("dataset_id") == dataset_id for d in datasets)
+                    return any(d.get("dataset_name") == dataset_name for d in datasets)
             return False
     except (json.JSONDecodeError, OSError):
         return False
@@ -122,24 +121,25 @@ def add_user_dataset_record(user_uid: str, dataset_name: str, dataset_id: str):
 
 # Create Shared Collection in Qdrant Cloud (If Not Exists)
 def initialize_chatbot(user_uid: str):
-    client_qdrant.create_collection(
-        collection_name="optimic_collection",
-        # 1. Dense vector configuration (named "dense")
-        vectors_config={
-            "dense": models.VectorParams(
-                size=384,  # all-MiniLM-L6-v2 output dimension
-                distance=models.Distance.COSINE,
-            )
-        },
-        # 2. Sparse vector configuration (named "sparse")
-        sparse_vectors_config={
-            "sparse": models.SparseVectorParams(
-                modifier=models.Modifier.IDF  # Recommended for BM25 scoring
-            )
-        },
-        # 3. Custom sharding for per-user shard keys
-        sharding_method=models.ShardingMethod.CUSTOM,
-    )
+    # client_qdrant.create_collection(
+    #     collection_name="optimic_collection",
+    #     # 1. Dense vector configuration (named "dense")
+    #     vectors_config={
+    #         "dense": models.VectorParams(
+    #             size=384,  # all-MiniLM-L6-v2 output dimension
+    #             distance=models.Distance.COSINE,
+    #         )
+    #     },
+    #     # 2. Sparse vector configuration (named "sparse")
+    #     sparse_vectors_config={
+    #         "sparse": models.SparseVectorParams(
+    #             modifier=models.Modifier.IDF  # Recommended for BM25 scoring
+    #         )
+    #     },
+    #     # 3. Custom sharding for per-user shard keys
+    #     sharding_method=models.ShardingMethod.CUSTOM,
+    # )
+    
 
     cluster_info = client_qdrant.get_collection(collection_name=COLLECTION_NAME)
     print("Cluster Info:", cluster_info)
@@ -149,9 +149,8 @@ def initialize_chatbot(user_uid: str):
             collection_name=COLLECTION_NAME,
             shard_key=user_uid
         )
-    except UnexpectedResponse:
-        # Shard key already exists; safe to proceed
-        pass
+    except UnexpectedResponse as e:
+        raise e
 
 
 
@@ -281,8 +280,8 @@ def generate_response(question: str, context: str) -> str:
 def get_response_from_qdrant(user_uid: str, dataset_id: str, question: str) -> str:
     # Retrieve relevant rows directly from the user's shard
     relevant_chunks = get_relevant_chunks_from_qdrant(question, dataset_id, user_uid)
-    print("Relevant Chunks Retrieved:", relevant_chunks)
     print("Question:", question)
+    print("Relevant Chunks Retrieved:", relevant_chunks)
     # Generate LLM response
     answer = generate_response(question, relevant_chunks)
     

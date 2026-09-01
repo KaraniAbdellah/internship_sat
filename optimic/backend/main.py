@@ -120,41 +120,62 @@ async def generate_offre(data: MarketingData, request: Request):
     }
 
 
+from fastapi import HTTPException
+
 @app.post("/upload-dataset")
 async def upload_dataset(dataUploaded: UploadData, request: Request):
-    user_uid = request.state.user.get("uid") or request.state.user.get("sub")
-    dataset_id = dataUploaded.dataset_id
-    dataset_name = dataUploaded.dataset_name
-    is_active = dataUploaded.is_active
-    rows = dataUploaded.rows
+    try:
+        user_uid = request.state.user.get("uid") or request.state.user.get("sub")
+        dataset_id = dataUploaded.dataset_id
+        dataset_name = dataUploaded.dataset_name
+        is_active = dataUploaded.is_active
+        rows = dataUploaded.rows
 
-    # 0.0: Check if dataset is already registered for this user
-    user_exit = get_user_dataset_record(user_uid, dataset_id)
-    print("Already exists:", user_exit)
+        # 0. Check if dataset already exists
+        user_exit = get_user_dataset_record(user_uid, dataset_id)
+        print("Already exists:", user_exit)
 
-    # 0.1: if Dataset Already Exists for the User, Return a Message
-    if user_exit:
-        dataset_exit = check_dataset_exists(user_uid, dataset_id)
-        print("Dataset Already Exists for the User:", dataset_exit)
-        if dataset_exit:
-            return {
-                "status": "Dataset already exists for this user",
-            }
+        if user_exit:
+            dataset_exit = check_dataset_exists(user_uid, dataset_name)
+            print("Dataset Already Exists:", dataset_exit)
 
-    # 1. Add User In the Registry File
-    add_user_dataset_record(user_uid, dataset_name, dataset_id)
+            if dataset_exit:
+                return {
+                    "status": "Dataset already exists for this user",
+                    "dataset_id": dataset_id
+                }
 
-    # 2: Initialize Qdrant Collection for the User
-    initialize_chatbot(user_uid)
+        else:
+            print("User does not exist. Creating new user record.")
+            # 1. Add user to registry
+            add_user_dataset_record(
+                user_uid,
+                dataset_name,
+                dataset_id
+            )
 
-    # 3: Process Data into Qdrant
-    process_data_into_qdrant(rows, dataset_id, user_uid)
+            # 2. Initialize Qdrant
+            initialize_chatbot(user_uid)
 
-    return {
-        "status": "Dataset saved in vector database",
-        "dataset_id": dataset_id,
-    }
+        # 3. Process data
+        process_data_into_qdrant(
+            rows,
+            dataset_id,
+            user_uid
+        )
 
+        return {
+            "status": "Dataset saved in vector database",
+            "dataset_id": dataset_id,
+        }
+
+    except Exception as e:
+        print("Upload dataset failed:", e)
+
+        raise HTTPException(
+            status_code=500,
+            detail="Request failed"
+        )
 
 @app.post("/ask-question")
 async def ask_question(data: ChatData, request: Request):
