@@ -72,4 +72,3 @@ export async function generateOffre(data: GenerateOfferPayload) {
   }
 }
 
-export async function sendOffre(data: GenerateOfferPayload) {}

@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { GoogleLogin } from "@react-oauth/google";
 import { jwtDecode } from "jwt-decode";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import image from "@/assets/optimic.png";
 import { authenticateUser } from "../services/auth";
 import { useContext } from "react";
@@ -27,7 +27,7 @@ export default function Auth() {
       console.log("Avatar Picture:", decoded.picture);
       const res = await authenticateUser(decoded.email, decoded.name);
       // Set Context
-      userContext.setUserData({
+      userContext?.setUserData({
         email: decoded.email,
         full_name: decoded.name,
         uid: res.user.uid
