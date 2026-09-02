@@ -7,7 +7,6 @@ import {
   makeDatasetActive,
 } from "@/features/Dashboard/services/chatBot";
 import UserDataContext from "@/global/context/UserDataContext";
-import { a } from "framer-motion/client";
 
 interface Message {
   id: string;
