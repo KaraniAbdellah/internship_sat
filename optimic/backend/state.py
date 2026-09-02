@@ -64,6 +64,9 @@ class MarketingState(TypedDict):
     next: Literal["SCORING", "GENERATION", "VALIDATION", "OPTIMISATION", "END"]
     messages: Annotated[list, add_messages]
 
+class DeleteDatasetData(BaseModel):
+    dataset_id: str
+    user_uid: str
 
 
 # Import Prompts

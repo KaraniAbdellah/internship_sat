@@ -1,4 +1,5 @@
 import { useContext, useState, useRef, useEffect } from "react";
+import { Database, Zap, MessageSquareMore, ArrowRight, Loader2 } from "lucide-react";
 import { DatasetContext } from "@/global/context/DatasetContext";
 import {
   askQuestion,
@@ -115,9 +116,7 @@ export default function ChatDatasetPanel() {
       <div className="flex items-center justify-between rounded-2xl border border-slate-200/80 bg-slate-50/70 px-4 py-3 shadow-xs">
         <div className="flex items-center gap-2.5 overflow-hidden">
           <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-orange-100 text-orange-600">
-            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
-            </svg>
+            <Database className="h-4 w-4" />
           </div>
           <div className="truncate">
             <p className="text-xs font-bold text-slate-800 truncate">
@@ -132,7 +131,7 @@ export default function ChatDatasetPanel() {
         <div className="flex items-center gap-1.5 shrink-0 text-[11px] font-semibold">
           {isUploading ? (
             <span className="flex items-center gap-1.5 text-orange-600 bg-orange-50 border border-orange-200/60 px-2.5 py-0.5 rounded-full">
-              <span className="h-2 w-2 animate-spin rounded-full border-2 border-orange-600 border-t-transparent" />
+              <Loader2 className="h-3 w-3 animate-spin text-orange-600" />
               Syncing
             </span>
           ) : isReady ? (
@@ -158,14 +157,12 @@ export default function ChatDatasetPanel() {
         >
           {isUploading ? (
             <>
-              <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+              <Loader2 className="h-3.5 w-3.5 animate-spin text-white" />
               <span>Indexing Dataset...</span>
             </>
           ) : (
             <>
-              <svg className="h-4 w-4 transition-transform group-hover:scale-110" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
+              <Zap className="h-4 w-4 transition-transform group-hover:scale-110" />
               <span>Connect Dataset for AI Chat</span>
             </>
           )}
@@ -176,9 +173,7 @@ export default function ChatDatasetPanel() {
       <div className="flex-1 flex flex-col gap-3 overflow-y-auto pr-1">
         {messages.length === 0 ? (
           <div className="m-auto text-center p-6 text-slate-400">
-            <svg className="h-8 w-8 mx-auto mb-2 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-            </svg>
+            <MessageSquareMore className="h-8 w-8 mx-auto mb-2 text-slate-300" strokeWidth={1.5} />
             <p className="text-xs font-medium">No messages yet</p>
             <p className="text-[11px] text-slate-400">Ask any question to analyze your dataset.</p>
           </div>
@@ -236,9 +231,7 @@ export default function ChatDatasetPanel() {
           className="h-11 px-4 flex items-center justify-center gap-1.5 rounded-xl bg-orange-600 hover:bg-orange-700 disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs font-bold transition-all shrink-0 active:scale-95"
         >
           <span>Send</span>
-          <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14m-7-7l7 7-7 7" />
-          </svg>
+          <ArrowRight className="h-3.5 w-3.5" strokeWidth={2.5} />
         </button>
       </div>
     </div>

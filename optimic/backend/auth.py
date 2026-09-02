@@ -1,5 +1,5 @@
-import json
 import os
+import sqlite3
 import uuid
 from datetime import datetime, timedelta, timezone
 from dotenv import load_dotenv
@@ -10,37 +10,43 @@ load_dotenv(".env")
 SECRET_KEY = os.getenv("SECRET_KEY", "your-super-secret-key-12345")
 ALGORITHM = os.getenv("ALGORITHM", "HS256")
 TOKEN_EXPIRE_DAYS = int(os.getenv("TOKEN_EXPIRE_DAYS", 7))
-
-AUTH_FILE = "auth.json"
-
-
-def load_auth() -> dict:
-    if not os.path.exists(AUTH_FILE):
-        with open(AUTH_FILE, "w") as f:
-            json.dump({"users": []}, f, indent=2)
-    with open(AUTH_FILE, "r") as f:
-        return json.load(f)
+AUTH_DB = "auth.db"
 
 
-def save_auth(data: dict):
-    with open(AUTH_FILE, "w") as f:
-        json.dump(data, f, indent=2)
+# def init_auth_db():
+#     with sqlite3.connect(AUTH_DB) as conn:
+#         conn.execute("""
+#             CREATE TABLE IF NOT EXISTS users (
+#                 uid TEXT PRIMARY KEY,
+#                 email TEXT UNIQUE,
+#                 name TEXT
+#             )
+#         """)
+
+
+# init_auth_db()
 
 
 def find_user_by_email(email: str):
-    auth = load_auth()
-    return next((u for u in auth["users"] if u["email"] == email), None)
+    with sqlite3.connect(AUTH_DB) as conn:
+        conn.row_factory = sqlite3.Row
+        row = conn.execute(
+            "SELECT * FROM users WHERE email = ?", (email,)
+        ).fetchone()
+        return dict(row) if row else None
 
 
 def create_user(email: str, name: str) -> dict:
-    auth = load_auth()
     user = {
         "uid": str(uuid.uuid4()),
         "email": email,
         "name": name,
     }
-    auth["users"].append(user)
-    save_auth(auth)
+    with sqlite3.connect(AUTH_DB) as conn:
+        conn.execute(
+            "INSERT INTO users (uid, email, name) VALUES (?, ?, ?)",
+            (user["uid"], user["email"], user["name"]),
+        )
     return user
 
 
@@ -63,7 +69,6 @@ def create_token(user: dict) -> str:
 
 
 def verify_token(token: str) -> dict:
-    """Decodes JWT and verifies user against auth.json."""
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
     except JWTError:
@@ -76,8 +81,10 @@ def verify_token(token: str) -> dict:
     if not uid or not email or not name:
         raise ValueError("Invalid token payload")
 
-    auth = load_auth()
-    user = next((u for u in auth["users"] if u["uid"] == uid), None)
+    with sqlite3.connect(AUTH_DB) as conn:
+        conn.row_factory = sqlite3.Row
+        row = conn.execute("SELECT * FROM users WHERE uid = ?", (uid,)).fetchone()
+        user = dict(row) if row else None
 
     if not user:
         raise ValueError("User not found in system")
@@ -88,11 +95,6 @@ def verify_token(token: str) -> dict:
     return user
 
 
-
 def delete_user(uid: str):
-    auth = load_auth()
-    auth["users"] = [u for u in auth["users"] if u["uid"] != uid]
-    save_auth(auth)
-
-
-
+    with sqlite3.connect(AUTH_DB) as conn:
+        conn.execute("DELETE FROM users WHERE uid = ?", (uid,))

@@ -1,206 +1,172 @@
-# Import packages
-import json
 import os
-import os
+import sqlite3
 import uuid
-from qdrant_client import QdrantClient, models
-from qdrant_client.http.models import PointStruct, Document, FusionQuery
-from qdrant_client.http.exceptions import UnexpectedResponse
 from dotenv import dotenv_values
-from state import fast_llm
 from groq import Groq
-from langchain_core.messages import SystemMessage, HumanMessage
+from langchain_core.messages import HumanMessage, SystemMessage
+from qdrant_client import QdrantClient, models
+from qdrant_client.http.exceptions import UnexpectedResponse
+from qdrant_client.http.models import Document, FusionQuery, PointStruct
+from state import fast_llm
 
-
+# Load prompt safely
+CHATBOT_PROMPT = ""
+if os.path.exists("./prompts/chatbot.md"):
+    with open("./prompts/chatbot.md", "r", encoding="utf-8") as f:
+        CHATBOT_PROMPT = f.read()
 
 # Load environment variables
-f = open("./prompts/chatbot.md")
-CHATBOT_PROMPT = f.read()
-f.close()
 config = dotenv_values(".env")
 QDRANT_CLOUD_API_KEY = config.get("QDRANT_CLOUD_API_KEY")
 QDRANT_CLOUD_ENDPOINT = config.get("QDRANT_CLOUD_ENDPOINT")
-GROQ_API_KEY  = config["GROQ_API_KEY"]
-REGISTRY_PATH = "chats.json"
+GROQ_API_KEY = config.get("GROQ_API_KEY")
 
-# Connection With QDrant Cloud
+CHATS_DB = "chats.db"
+COLLECTION_NAME = "optimic_collection"
+
+# Connect to Qdrant Cloud
 client_qdrant = QdrantClient(
     url=QDRANT_CLOUD_ENDPOINT,
     api_key=QDRANT_CLOUD_API_KEY,
     cloud_inference=True,
-    timeout=60
+    timeout=60,
 )
 
-# Get Groq Model
+# Connect to Groq
 client_groq = Groq(api_key=GROQ_API_KEY)
 
 
+# def init_chats_db():
+#     with sqlite3.connect(CHATS_DB) as conn:
+#         conn.execute("""
+#             CREATE TABLE IF NOT EXISTS datasets (
+#                 user_uid TEXT,
+#                 dataset_id TEXT PRIMARY KEY,
+#                 dataset_name TEXT
+#             )
+#         """)
 
-# Collection Creation - Collection That Support Hybrid Search
-COLLECTION_NAME = "optimic_collection"
+
+# init_chats_db()
 
 
 def get_user_dataset_record(user_uid: str, dataset_id: str) -> bool:
-    """Check if the user and dataset already exist in the file."""
-    if not os.path.exists(REGISTRY_PATH):
-        return False
-
-    try:
-        with open(REGISTRY_PATH, "r") as file:
-            records = json.load(file)
-            if not isinstance(records, list):
-                return False
-
-            return any(
-                record.get("user_uid") == user_uid
-                for record in records
-            )
-    except (json.JSONDecodeError, OSError):
-        return False
+    """Check if any datasets exist for the user."""
+    with sqlite3.connect(CHATS_DB) as conn:
+        row = conn.execute(
+            "SELECT 1 FROM datasets WHERE user_uid = ? LIMIT 1", (user_uid,)
+        ).fetchone()
+        return row is not None
 
 
 def check_dataset_exists(user_uid: str, dataset_name: str) -> bool:
-    """Check if the dataset exists for the given user."""
-    if not os.path.exists(REGISTRY_PATH):
-        return False
-
-    try:
-        with open(REGISTRY_PATH, "r") as file:
-            records = json.load(file)
-            if not isinstance(records, list):
-                return False
-
-            for record in records:
-                if record.get("user_uid") == user_uid:
-                    datasets = record.get("datasets", [])
-                    return any(d.get("dataset_name") == dataset_name for d in datasets)
-            return False
-    except (json.JSONDecodeError, OSError):
-        return False
+    """Check if a specific dataset name exists for the given user."""
+    with sqlite3.connect(CHATS_DB) as conn:
+        row = conn.execute(
+            "SELECT 1 FROM datasets WHERE user_uid = ? AND dataset_name = ? LIMIT 1",
+            (user_uid, dataset_name),
+        ).fetchone()
+        return row is not None
 
 
 def add_user_dataset_record(user_uid: str, dataset_name: str, dataset_id: str):
-    """Add a new dataset to an existing user or create a new user record."""
-    records = []
-    if os.path.exists(REGISTRY_PATH):
-        try:
-            with open(REGISTRY_PATH, "r") as file:
-                loaded = json.load(file)
-                if isinstance(loaded, list):
-                    records = loaded
-        except (json.JSONDecodeError, OSError):
-            records = []
-
-    new_dataset = {
-        "dataset_name": dataset_name,
-        "dataset_id": dataset_id
-    }
-
-    user_found = False
-    for record in records:
-        if record.get("user_uid") == user_uid:
-            user_found = True
-            if "datasets" not in record or not isinstance(record["datasets"], list):
-                record["datasets"] = []
-
-            # Avoid adding duplicate dataset_id entries under the user
-            if not any(d.get("dataset_id") == dataset_id for d in record["datasets"]):
-                record["datasets"].append(new_dataset)
-            break
-
-    if not user_found:
-        records.append({
-            "user_uid": user_uid,
-            "datasets": [new_dataset]
-        })
-
-    with open(REGISTRY_PATH, "w") as file:
-        json.dump(records, file, indent=2)
+    """Insert or update a dataset record."""
+    with sqlite3.connect(CHATS_DB) as conn:
+        conn.execute(
+            "INSERT OR REPLACE INTO datasets (user_uid, dataset_id, dataset_name) VALUES (?, ?, ?)",
+            (user_uid, dataset_id, dataset_name),
+        )
 
 
+def delete_dataset_from_registry(user_uid: str, dataset_id: str):
+    """Delete a dataset from SQLite."""
+    with sqlite3.connect(CHATS_DB) as conn:
+        conn.execute(
+            "DELETE FROM datasets WHERE user_uid = ? AND dataset_id = ?",
+            (user_uid, dataset_id),
+        )
+    print(f"Dataset {dataset_id} removed from SQLite registry for user {user_uid}.")
 
-# Create Shared Collection in Qdrant Cloud (If Not Exists)
+
 def initialize_chatbot(user_uid: str):
-    # client_qdrant.create_collection(
-    #     collection_name="optimic_collection",
-    #     # 1. Dense vector configuration (named "dense")
-    #     vectors_config={
-    #         "dense": models.VectorParams(
-    #             size=384,  # all-MiniLM-L6-v2 output dimension
-    #             distance=models.Distance.COSINE,
-    #         )
-    #     },
-    #     # 2. Sparse vector configuration (named "sparse")
-    #     sparse_vectors_config={
-    #         "sparse": models.SparseVectorParams(
-    #             modifier=models.Modifier.IDF  # Recommended for BM25 scoring
-    #         )
-    #     },
-    #     # 3. Custom sharding for per-user shard keys
-    #     sharding_method=models.ShardingMethod.CUSTOM,
-    # )
-    
+    """Ensure collection, indices, and user shard exist."""
+    collections = client_qdrant.get_collections().collections
+    collection_exists = any(c.name == COLLECTION_NAME for c in collections)
 
-    cluster_info = client_qdrant.get_collection(collection_name=COLLECTION_NAME)
-    print("Cluster Info:", cluster_info)
+    if not collection_exists:
+        client_qdrant.create_collection(
+            collection_name=COLLECTION_NAME,
+            vectors_config={
+                "dense": models.VectorParams(
+                    size=384,
+                    distance=models.Distance.COSINE,
+                )
+            },
+            sparse_vectors_config={
+                "sparse": models.SparseVectorParams(modifier=models.Modifier.IDF)
+            },
+            sharding_method=models.ShardingMethod.CUSTOM,
+        )
+
+        # Create required payload indices so filtering and deleting works
+        client_qdrant.create_payload_index(
+            collection_name=COLLECTION_NAME,
+            field_name="dataset_id",
+            field_schema="keyword",
+        )
+        client_qdrant.create_payload_index(
+            collection_name=COLLECTION_NAME,
+            field_name="user_uid",
+            field_schema="keyword",
+        )
+
     print("Initializing Qdrant Collection for user By Creating Shard:", user_uid)
     try:
         client_qdrant.create_shard_key(
-            collection_name=COLLECTION_NAME,
-            shard_key=user_uid
+            collection_name=COLLECTION_NAME, shard_key=user_uid
         )
-    except UnexpectedResponse as e:
-        raise e
+    except UnexpectedResponse:
+        pass
 
 
-
-# Preprocessing
-def add_doc_qdrant_cloud(rows: str, payload: dict, user_uid: str):
+def add_doc_qdrant_cloud(rows: list, payload: dict, user_uid: str):
     for row in rows:
-        print("Adding row to Qdrant Cloud: ", row)
         points = [
-                models.PointStruct(
-                    id=uuid.uuid4().hex,
-                    vector={
-                        "dense": Document(
-                            text=str(row),
-                            model="sentence-transformers/all-MiniLM-L6-v2",
-                        ),
-                        "sparse": Document(
-                            text=str(row),
-                            model="Qdrant/bm25",
-                        ),
-                    },
-                    payload=payload,
-                )
+            models.PointStruct(
+                id=uuid.uuid4().hex,
+                vector={
+                    "dense": Document(
+                        text=str(row),
+                        model="sentence-transformers/all-MiniLM-L6-v2",
+                    ),
+                    "sparse": Document(
+                        text=str(row),
+                        model="Qdrant/bm25",
+                    ),
+                },
+                payload=payload,
+            )
         ]
         client_qdrant.upsert(
             collection_name=COLLECTION_NAME,
             points=points,
-            shard_key_selector=user_uid
+            shard_key_selector=user_uid,
         )
 
 
 def process_data_into_qdrant(rows: list[list[str]], dataset_id: str, user_uid: str):
     print("Processing data into Qdrant...")
-    payload = {
-        "dataset_id": dataset_id,
-        "user_uid": user_uid
-    }
+    payload = {"dataset_id": dataset_id, "user_uid": user_uid}
     add_doc_qdrant_cloud(rows, payload, user_uid)
 
 
-
-# 1. Retrieve relevant chunks using shard_key routing and dataset_id filtering
-def get_relevant_chunks_from_qdrant(question: str, dataset_uid: str, user_uid: str, limit: int = 5) -> str:
+def get_relevant_chunks_from_qdrant(
+    question: str, dataset_uid: str, user_uid: str, limit: int = 5
+) -> str:
     try:
         results = client_qdrant.query_points(
             collection_name=COLLECTION_NAME,
-            
-            # Multi-tenant isolation: routes strictly to the user's logical shard
             shard_key_selector=user_uid,
-            
-            # Metadata filter: targets only the selected dataset inside the user's shard
             query_filter=models.Filter(
                 must=[
                     models.FieldCondition(
@@ -209,8 +175,6 @@ def get_relevant_chunks_from_qdrant(question: str, dataset_uid: str, user_uid: s
                     )
                 ]
             ),
-            
-            # Hybrid search (Dense + Sparse BM25) merged via Reciprocal Rank Fusion (RRF)
             prefetch=[
                 models.Prefetch(
                     query=Document(
@@ -229,17 +193,15 @@ def get_relevant_chunks_from_qdrant(question: str, dataset_uid: str, user_uid: s
                     limit=limit * 2,
                 ),
             ],
-            
             query=FusionQuery(fusion=models.Fusion.RRF),
             limit=limit,
         )
 
-        # Extract text representations from matched point payloads
         chunks = []
         for point in results.points:
             content = (
-                point.payload.get("text") 
-                or point.payload.get("text_representation") 
+                point.payload.get("text")
+                or point.payload.get("text_representation")
                 or str(point.payload.get("raw_data", ""))
             )
             if content:
@@ -255,7 +217,6 @@ def get_relevant_chunks_from_qdrant(question: str, dataset_uid: str, user_uid: s
         return ""
 
 
-# 2. Generate Answer based on Context and Prompt
 def generate_response(question: str, context: str) -> str:
     sys_prompt = CHATBOT_PROMPT
     message = f"""
@@ -268,7 +229,6 @@ def generate_response(question: str, context: str) -> str:
         HumanMessage(content=message),
     ]
 
-    # Stream chunks from LangChain LLM and aggregate
     res = []
     for chunk in fast_llm.stream(messages):
         if chunk.content:
@@ -276,14 +236,35 @@ def generate_response(question: str, context: str) -> str:
 
     return "".join(res)
 
-# 3. Orchestration Entry Point
+
 def get_response_from_qdrant(user_uid: str, dataset_id: str, question: str) -> str:
-    # Retrieve relevant rows directly from the user's shard
     relevant_chunks = get_relevant_chunks_from_qdrant(question, dataset_id, user_uid)
-    print("Question:", question)
-    print("Relevant Chunks Retrieved:", relevant_chunks)
-    # Generate LLM response
-    answer = generate_response(question, relevant_chunks)
-    
-    return answer
+    return generate_response(question, relevant_chunks)
+
+
+def delete_dataset_from_qdrant(dataset_id: str, user_uid: str):
+    try:
+        client_qdrant.delete(
+            collection_name=COLLECTION_NAME,
+            points_selector=models.FilterSelector(
+                filter=models.Filter(
+                    must=[
+                        models.FieldCondition(
+                            key="dataset_id",
+                            match=models.MatchValue(value=dataset_id),
+                        ),
+                        models.FieldCondition(
+                            key="user_uid",
+                            match=models.MatchValue(value=user_uid),
+                        ),
+                    ]
+                )
+            ),
+            shard_key_selector=user_uid,
+        )
+        print("Dataset deleted successfully from Qdrant.")
+    except Exception as e:
+        print(f"Failed to delete dataset: {e}")
+
+
 

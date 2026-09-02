@@ -8,6 +8,7 @@ import { parseCSV } from "../../utils/csvParser";
 import { persistDataset, removeDataset } from "../../services/datasetDb";
 import DatasetsPanelHeader from "./DatasetsPanelHeader";
 import DatasetList from "./DatasetList";
+import UserDataContext from "@/global/context/UserDataContext";
 
 type DatasetsPanelProps = {
   isCollapsed: boolean;
@@ -17,6 +18,7 @@ export default function DatasetsPanel({ isCollapsed }: DatasetsPanelProps) {
   const datasetCtx = useContext(DatasetContext);
   const customerCtx = useContext(CustomerDataContext);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const userCtx = useContext(UserDataContext);
 
   if (!datasetCtx) return null;
 
@@ -60,7 +62,14 @@ export default function DatasetsPanel({ isCollapsed }: DatasetsPanelProps) {
 
   const handleDeleteDataset = async (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
-    await removeDataset(id);
+    console.log(`Attempting to delete dataset with ID: ${id}`);
+    const user_uid = userCtx?.user_data.uid;
+
+    if (!user_uid) {
+      toast.error("User UID not found. Cannot delete dataset.");
+      return;
+    }
+    await removeDataset(id, user_uid);
     const remaining = datasets.filter((d) => d.id !== id);
     setDatasets(remaining);
 

@@ -1,5 +1,6 @@
 import { DatasetType } from "@/global/types/DatasetType";
 import { DB_CONFIG } from "../constants/conts";
+const API_KEY = import.meta.env.VITE_API_URL;
 
 export const openDatabase = (): Promise<IDBDatabase> => {
   return new Promise((resolve, reject) => {
@@ -60,8 +61,32 @@ export async function persistPolicy(id: string, policy: string): Promise<void> {
   });
 }
 
-export async function removeDataset(id: string): Promise<void> {
+
+
+export async function removeDataset(id: string, userUid: string): Promise<void> {
   const db = await openDatabase();
+  console.log(`Attempting to delete dataset with ID: ${id} for user UID: ${userUid}`);
+
+  // 1. Call backend API to delete from Qdrant
+  const res = await fetch(`${API_KEY}/delete-dataset`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      // Include authorization headers here if using auth tokens
+    },
+    credentials: "include", // Include cookies if needed
+    body: JSON.stringify({
+      dataset_id: id,
+      user_uid: userUid,
+    }),
+  }); 
+
+  if (!res.ok) {
+    const errorBody = await res.json().catch(() => ({}));
+    throw new Error(errorBody.message || `Failed to delete dataset: ${res.statusText}`);
+  }
+
+  // 2. Delete from local IndexedDB only after remote deletion succeeds
   return new Promise((resolve, reject) => {
     const tx = db.transaction(DB_CONFIG.STORE, "readwrite");
     const store = tx.objectStore(DB_CONFIG.STORE);
@@ -71,3 +96,4 @@ export async function removeDataset(id: string): Promise<void> {
     tx.onerror = () => reject(tx.error);
   });
 }
+

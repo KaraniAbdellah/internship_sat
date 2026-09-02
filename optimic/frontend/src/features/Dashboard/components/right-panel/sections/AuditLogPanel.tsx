@@ -20,7 +20,7 @@ export default function AuditLogPanel({ offerResult }: AuditLogPanelProps) {
           STATUS: {offerResult?.validation_feedback ? "VALID" : "PENDING"}
         </p>
       </div>
-
+ChatDatasetPanel
       <div className="rounded-xl border border-slate-200 bg-white p-3">
         <p className="text-slate-400 font-bold text-xs">[3. Optimization Agent]</p>
         <p className="text-slate-700 font-semibold mt-1">
