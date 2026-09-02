@@ -4,7 +4,7 @@ import { openDatabase } from "./datasetDb";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000"; // Replace with your backend API base URL
 async function startChatWithDataset(
-  rows: string[][] | undefined,
+  rows: string[][],
   id: string,
   name: string,
   isActive: boolean,

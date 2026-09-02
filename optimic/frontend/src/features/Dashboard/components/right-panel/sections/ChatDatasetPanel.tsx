@@ -43,8 +43,8 @@ export default function ChatDatasetPanel() {
       const userUid = user?.user_data?.uid || "";
 
       await startChatWithDataset(
-        activeDataset?.rows,
-        activeDataset?.id,
+        activeDataset.rows,
+        activeDataset.id,
         activeDataset.name,
         activeDataset.isActive,
         userUid
