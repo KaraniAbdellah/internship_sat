@@ -7,6 +7,7 @@ import {
   makeDatasetActive,
 } from "@/features/Dashboard/services/chatBot";
 import UserDataContext from "@/global/context/UserDataContext";
+import { a } from "framer-motion/client";
 
 interface Message {
   id: string;
@@ -41,6 +42,9 @@ export default function ChatDatasetPanel() {
     setIsUploading(true);
     try {
       const userUid = user?.user_data?.uid || "";
+      if (!userUid) {
+        throw new Error("User UID not found. Cannot start chat.");
+      }
 
       await startChatWithDataset(
         activeDataset.rows,
