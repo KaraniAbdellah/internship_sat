@@ -3,7 +3,7 @@ import { UserDataType } from "../types/UserDataType";
 
 type UserDataContextValue = {
   user_data: UserDataType | null;
-  setUserData: Dispatch<SetStateAction<UserDataType>>;
+  setUserData: Dispatch<SetStateAction<UserDataType | null>>;
 };
 
 const UserDataContext = createContext<UserDataContextValue | null>(null);
