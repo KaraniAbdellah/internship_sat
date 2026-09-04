@@ -5,13 +5,14 @@ import { openDatabase } from "./datasetDb";
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000"; // Replace with your backend API base URL
 async function startChatWithDataset(
   rows: string[][],
+  headers: string[],
   id: string,
   name: string,
   isActive: boolean,
   user_uid: string,
 ) {
   try {
-    console.log("Sending data to backend:", { rows, id, name, user_uid });
+    console.log("Sending data to backend:", { rows, headers, id, name, user_uid });
     const response = await fetch(`${API_BASE_URL}/upload-dataset`, {
       method: "POST",
       headers: {
@@ -20,6 +21,7 @@ async function startChatWithDataset(
       credentials: "include", // Required to send auth_token cookie
       body: JSON.stringify({
         rows: rows,
+        headers: headers,
         dataset_id: id,
         dataset_name: name,
         isActive: isActive,

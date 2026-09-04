@@ -129,18 +129,24 @@ def initialize_chatbot(user_uid: str):
         pass
 
 
-def add_doc_qdrant_cloud(rows: list, payload: dict, user_uid: str):
+
+def add_doc_qdrant_cloud(rows: list, headers: list, payload: dict, user_uid: str):
+    print("Adding documents to Qdrant Cloud...")
+    
     for row in rows:
+        doc = ""
+        for header, value in zip(headers, row):
+            doc += f"{header}: {value}\n"
         points = [
             models.PointStruct(
                 id=uuid.uuid4().hex,
                 vector={
                     "dense": Document(
-                        text=str(row),
+                        text=doc,
                         model="sentence-transformers/all-MiniLM-L6-v2",
                     ),
                     "sparse": Document(
-                        text=str(row),
+                        text=doc,
                         model="Qdrant/bm25",
                     ),
                 },
@@ -154,10 +160,11 @@ def add_doc_qdrant_cloud(rows: list, payload: dict, user_uid: str):
         )
 
 
-def process_data_into_qdrant(rows: list[list[str]], dataset_id: str, user_uid: str):
+
+def process_data_into_qdrant(rows: list[list[str]], headers: list[str], dataset_id: str, user_uid: str):
     print("Processing data into Qdrant...")
     payload = {"dataset_id": dataset_id, "user_uid": user_uid}
-    add_doc_qdrant_cloud(rows, payload, user_uid)
+    add_doc_qdrant_cloud(rows, headers, payload, user_uid)
 
 
 def get_relevant_chunks_from_qdrant(
@@ -196,7 +203,7 @@ def get_relevant_chunks_from_qdrant(
             query=FusionQuery(fusion=models.Fusion.RRF),
             limit=limit,
         )
-
+        print("results:", results)
         chunks = []
         for point in results.points:
             content = (

@@ -47,6 +47,7 @@ export default function ChatDatasetPanel() {
 
       await startChatWithDataset(
         activeDataset.rows,
+        activeDataset.headers,
         activeDataset.id,
         activeDataset.name,
         activeDataset.isActive,

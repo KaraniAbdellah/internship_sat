@@ -123,6 +123,7 @@ async def upload_dataset(dataUploaded: UploadData, request: Request):
         dataset_id = dataUploaded.dataset_id
         dataset_name = dataUploaded.dataset_name
         rows = dataUploaded.rows
+        headers = dataUploaded.headers
 
         user_exit = get_user_dataset_record(user_uid, dataset_id)
 
@@ -140,8 +141,8 @@ async def upload_dataset(dataUploaded: UploadData, request: Request):
         # Ensure dataset metadata is tracked in SQLite
         add_user_dataset_record(user_uid, dataset_name, dataset_id)
 
-        process_data_into_qdrant(rows, dataset_id, user_uid)
-
+        process_data_into_qdrant(rows, headers, dataset_id, user_uid)
+    
         return {
             "status": "Dataset saved in vector database",
             "dataset_id": dataset_id,
