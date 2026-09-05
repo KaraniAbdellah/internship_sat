@@ -29,17 +29,20 @@ export default function SidebarNav({
                 isCollapsed ? "justify-center p-3" : "gap-3.5 px-3.5 py-3"
               } ${
                 isActive
-                  ? "bg-gray-100 text-white shadow-md shadow-gray-600/20"
-                  : "text-slate-600 hover:text-gray-600 hover:bg-gray-50"
+                  ? "bg-orange-500 text-white shadow-md shadow-orange-500/20"
+                  : "text-slate-600 hover:bg-orange-50 hover:text-orange-600"
               }`}
             >
               <Icon
                 className={`w-5 h-5 shrink-0 ${
-                  isActive ? "text-gray-500" : "text-slate-500"
+                  isActive
+                    ? "text-white"
+                    : "text-slate-500 group-hover:text-orange-600"
                 }`}
               />
+
               {!isCollapsed && (
-                <span className="truncate text-gray-500 whitespace-nowrap">{item.label}</span>
+                <span className="truncate whitespace-nowrap">{item.label}</span>
               )}
             </button>
           </React.Fragment>

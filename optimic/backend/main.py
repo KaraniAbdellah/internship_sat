@@ -2,6 +2,7 @@ from fastapi import FastAPI, HTTPException, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 
 from agents import compile_state_graph
+
 from auth import TOKEN_EXPIRE_DAYS, create_token, delete_user, get_or_create_user, verify_token
 from chatbot import (
     add_user_dataset_record,
@@ -13,10 +14,13 @@ from chatbot import (
     initialize_chatbot,
     process_data_into_qdrant,
 )
-from models.models import ChatData, MarketingData, UploadData, UserData
+from anaylse import run_dataset_analysis
+from models.models import ChatData, MarketingData, UploadData, UserData, AnalyseData
 from state import DeleteDatasetData
 
+
 app = FastAPI()
+# Mount the router under app
 
 origins = [
     "http://localhost:5173",
@@ -142,7 +146,7 @@ async def upload_dataset(dataUploaded: UploadData, request: Request):
         add_user_dataset_record(user_uid, dataset_name, dataset_id)
 
         process_data_into_qdrant(rows, headers, dataset_id, user_uid)
-    
+
         return {
             "status": "Dataset saved in vector database",
             "dataset_id": dataset_id,
@@ -192,3 +196,18 @@ def logout_user(response: Response):
         samesite="lax",
     )
     return {"message": "Logged out successfully"}
+
+
+
+@app.post("/analyse/query")
+async def analyse_dataset(data: AnalyseData, request: Request):
+    user = request.state.user
+
+    result = await run_dataset_analysis(
+        question=data.question,
+        headers=data.headers,
+        rows=data.rows,
+        dataset_name=data.dataset_name,
+    )
+
+    return result

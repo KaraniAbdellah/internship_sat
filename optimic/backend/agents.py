@@ -20,7 +20,7 @@ from state import fast_llm
 async def scoring_agent(state: MarketingState):
     print("Scoring Agent ...")
     customer_data = state.get("customer_data", "no customer data")
-    
+
     messages = [SystemMessage(content=SCORING_PROMPT), HumanMessage(content=f"""
         Customer Data: \n\n
             {customer_data}
@@ -41,12 +41,12 @@ async def generation_agent(state: MarketingState):
         Customer Score: {state.get('score')}
         Active Rules: {state.get('offre_rules')}
     """
-    
+
     messages = [
         SystemMessage(content=GENERATION_PROMPT),
         HumanMessage(
             content=f"""
-            Current Context: \n\n   
+            Current Context: \n\n
                 {current_context}
             """
         )
@@ -136,7 +136,7 @@ def compile_state_graph():
 
 
     workflow.set_entry_point("supervisor_agent")
-    workflow.add_conditional_edges("supervisor_agent", routerForSupervisor, 
+    workflow.add_conditional_edges("supervisor_agent", routerForSupervisor,
         {
             "SCORING": "scoring_agent",
             "GENERATION": "generation_agent",
@@ -149,7 +149,3 @@ def compile_state_graph():
     # Memory
     checkpointer = InMemorySaver()
     return workflow.compile(checkpointer=checkpointer)
-
-
-
-

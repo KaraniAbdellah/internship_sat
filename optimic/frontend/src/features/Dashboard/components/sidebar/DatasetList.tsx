@@ -6,6 +6,7 @@ type DatasetListProps = {
   activeDatasetId: string | null;
   isCollapsed: boolean;
   canDelete: boolean;
+  deletingId?: string | null;
   onSelect: (dataset: DatasetType) => void;
   onDelete: (e: React.MouseEvent, datasetId: string) => void;
 };
@@ -15,6 +16,7 @@ export default function DatasetList({
   activeDatasetId,
   isCollapsed,
   canDelete,
+  deletingId,
   onSelect,
   onDelete,
 }: DatasetListProps) {
@@ -39,7 +41,8 @@ export default function DatasetList({
             item={item}
             isActive={activeDatasetId === item.id}
             isCollapsed={isCollapsed}
-            canDelete={canDelete}
+            canDelete={canDelete && deletingId !== item.id}
+            isDeleting={deletingId === item.id}
             onSelect={() => onSelect(item)}
             onDelete={(e) => onDelete(e, item.id)}
           />

@@ -4,14 +4,11 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from typing_extensions import TypedDict, Literal, List
 import os
 from dotenv import load_dotenv
-from langchain_groq import ChatGroq
 from langgraph.graph.message import add_messages
 from typing import Annotated
 
 
-
-
-# # Prompt Caching
+# Prompt Caching
 from langchain_core.globals import set_llm_cache
 from langchain_community.cache import InMemoryCache
 from pydantic import BaseModel
@@ -32,6 +29,9 @@ fast_llm = ChatGroq(model="openai/gpt-oss-20b", api_key = GROQ_API_KEY, temperat
 #     temperature=0.5,
 #     api_key=GOOGLE_API_KEY
 # )
+
+
+
 """
     - Supported Modal:
         groq/compound-mini
@@ -49,7 +49,7 @@ fast_llm = ChatGroq(model="openai/gpt-oss-20b", api_key = GROQ_API_KEY, temperat
         canopylabs/orpheus-v1-english
 """
 
-# State Definition 
+# State Definition
 class ValidationResult(BaseModel):
     validation: bool
     description: str
@@ -72,10 +72,11 @@ class DeleteDatasetData(BaseModel):
 # Import Prompts
 f = open("./prompts/generations.md")
 GENERATION_PROMPT = f.read()
+f = open("./prompts/analytics.md")
+ANALYTICS_PROMPT = f.read()
 f = open("./prompts/optimisation.md")
 OPTIMISATION_PROMPT = f.read()
 f = open("./prompts/scoring.md")
 SCORING_PROMPT = f.read()
 f = open("./prompts/validation.md")
 VALIDATION_PROMPT = f.read()
-

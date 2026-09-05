@@ -137,6 +137,8 @@ def add_doc_qdrant_cloud(rows: list, headers: list, payload: dict, user_uid: str
         doc = ""
         for header, value in zip(headers, row):
             doc += f"{header}: {value}\n"
+        print(doc)
+        payload["text"] = doc
         points = [
             models.PointStruct(
                 id=uuid.uuid4().hex,
@@ -206,13 +208,7 @@ def get_relevant_chunks_from_qdrant(
         print("results:", results)
         chunks = []
         for point in results.points:
-            content = (
-                point.payload.get("text")
-                or point.payload.get("text_representation")
-                or str(point.payload.get("raw_data", ""))
-            )
-            if content:
-                chunks.append(content)
+            chunks.append(point.payload.get("text"))
 
         if not chunks:
             return "No relevant chunks found."

@@ -1,5 +1,12 @@
 import { useContext, useState, useRef, useEffect } from "react";
-import { Database, Zap, MessageSquareMore, ArrowRight, Loader2 } from "lucide-react";
+import {
+  Database,
+  Zap,
+  MessageSquareMore,
+  ArrowRight,
+  Loader2,
+  Trash2,
+} from "lucide-react";
 import { DatasetContext } from "@/global/context/DatasetContext";
 import {
   askQuestion,
@@ -27,10 +34,25 @@ export default function ChatDatasetPanel() {
 
   const isReady = Boolean(activeDataset?.isActive);
 
+  // Clear messages whenever the user selects a different dataset
+  useEffect(() => {
+    setMessages([]);
+    setInputValue("");
+    setIsThinking(false);
+  }, [activeDataset?.id]);
+
   // Auto-scroll to latest message
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isThinking]);
+
+  // Clear chat state locally
+  const handleClearChat = () => {
+    if (messages.length === 0) return;
+    setMessages([]);
+    setInputValue("");
+    setIsThinking(false);
+  };
 
   const uploadDataset = async () => {
     if (!activeDataset) {
@@ -51,7 +73,7 @@ export default function ChatDatasetPanel() {
         activeDataset.id,
         activeDataset.name,
         activeDataset.isActive,
-        userUid
+        userUid,
       );
 
       datasetCtx?.setActiveDataset({ ...activeDataset, isActive: true });
@@ -116,38 +138,59 @@ export default function ChatDatasetPanel() {
 
   return (
     <div className="h-full flex flex-col gap-3">
-      {/* Header & Status */}
-      <div className="flex items-center justify-between rounded-2xl border border-slate-200/80 bg-slate-50/70 px-4 py-3 shadow-xs">
-        <div className="flex items-center gap-2.5 overflow-hidden">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-orange-100 text-orange-600">
-            <Database className="h-4 w-4" />
+      {/* Header & Status Card */}
+      <div className="flex items-center justify-between gap-4 rounded-2xl border border-slate-200/80 bg-slate-50/70 px-4 py-3 shadow-xs">
+        {/* Left: Dataset Details */}
+        <div className="flex min-w-0 items-center gap-3">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-orange-100 text-orange-600">
+            <Database className="h-4.5 w-4.5" />
           </div>
-          <div className="truncate">
-            <p className="text-xs font-bold text-slate-800 truncate">
+
+          <div className="min-w-0">
+            <p className="truncate text-xs font-bold text-slate-800">
               {activeDataset?.name || "No Dataset Selected"}
             </p>
             <p className="text-[10px] text-slate-400">
-              {activeDataset?.rows?.length ? `${activeDataset.rows.length} rows loaded` : "Select a dataset to begin"}
+              {activeDataset?.rows?.length
+                ? `${activeDataset.rows.length.toLocaleString()} rows loaded`
+                : "Select a dataset to begin"}
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-1.5 shrink-0 text-[11px] font-semibold">
-          {isUploading ? (
-            <span className="flex items-center gap-1.5 text-orange-600 bg-orange-50 border border-orange-200/60 px-2.5 py-0.5 rounded-full">
-              <Loader2 className="h-3 w-3 animate-spin text-orange-600" />
-              Syncing
-            </span>
-          ) : isReady ? (
-            <span className="flex items-center gap-1.5 text-emerald-700 bg-emerald-50 border border-emerald-200/70 px-2.5 py-0.5 rounded-full">
-              <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-              Ready
-            </span>
-          ) : (
-            <span className="flex items-center gap-1.5 text-slate-500 bg-slate-100 border border-slate-200 px-2.5 py-0.5 rounded-full">
-              <span className="h-2 w-2 rounded-full bg-slate-300" />
-              Not Connected
-            </span>
+        {/* Right: Status Badge & Actions */}
+        <div className="flex shrink-0 items-center gap-2">
+          {/* Status Indicator */}
+          <div className="text-[11px] font-semibold">
+            {isUploading ? (
+              <span className="flex items-center gap-1.5 rounded-full border border-orange-200/60 bg-orange-50 px-2.5 py-0.5 text-orange-600">
+                <Loader2 className="h-3 w-3 animate-spin text-orange-600" />
+                Syncing
+              </span>
+            ) : isReady ? (
+              <span className="flex items-center gap-1.5 rounded-full border border-emerald-200/70 bg-emerald-50 px-2.5 py-0.5 text-emerald-700">
+                <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                Ready
+              </span>
+            ) : (
+              <span className="flex items-center gap-1.5 rounded-full border border-slate-200 bg-slate-100 px-2.5 py-0.5 text-slate-500">
+                <span className="h-2 w-2 rounded-full bg-slate-300" />
+                Not Connected
+              </span>
+            )}
+          </div>
+
+          {/* Delete / Clear Messages Button */}
+          {messages.length > 0 && (
+            <button
+              type="button"
+              onClick={handleClearChat}
+              title="Clear chat history"
+              aria-label="Clear chat messages"
+              className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-rose-50 hover:text-rose-600 focus-visible:outline-2 focus-visible:outline-rose-500"
+            >
+              <Trash2 className="h-4 w-4" />
+            </button>
           )}
         </div>
       </div>
@@ -177,9 +220,14 @@ export default function ChatDatasetPanel() {
       <div className="flex-1 flex flex-col gap-3 overflow-y-auto pr-1">
         {messages.length === 0 ? (
           <div className="m-auto text-center p-6 text-slate-400">
-            <MessageSquareMore className="h-8 w-8 mx-auto mb-2 text-slate-300" strokeWidth={1.5} />
+            <MessageSquareMore
+              className="h-8 w-8 mx-auto mb-2 text-slate-300"
+              strokeWidth={1.5}
+            />
             <p className="text-xs font-medium">No messages yet</p>
-            <p className="text-[11px] text-slate-400">Ask any question to analyze your dataset.</p>
+            <p className="text-[11px] text-slate-400">
+              Ask any question to analyze your dataset.
+            </p>
           </div>
         ) : (
           messages.map((msg) =>
@@ -197,7 +245,7 @@ export default function ChatDatasetPanel() {
               >
                 {msg.text}
               </div>
-            )
+            ),
           )
         )}
 

@@ -1,4 +1,4 @@
-import { useContext, useRef } from "react";
+import { useContext, useRef, useState } from "react";
 import toast from "react-hot-toast";
 
 import { DatasetContext } from "@/global/context/DatasetContext";
@@ -19,6 +19,9 @@ export default function DatasetsPanel({ isCollapsed }: DatasetsPanelProps) {
   const customerCtx = useContext(CustomerDataContext);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const userCtx = useContext(UserDataContext);
+
+  // Tracks the ID of the dataset currently being deleted
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   if (!datasetCtx) return null;
 
@@ -62,6 +65,10 @@ export default function DatasetsPanel({ isCollapsed }: DatasetsPanelProps) {
 
   const handleDeleteDataset = async (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
+
+    // Prevent duplicate triggers while a delete is in progress
+    if (deletingId) return;
+
     console.log(`Attempting to delete dataset with ID: ${id}`);
     const user_uid = userCtx.user_data.uid;
 
@@ -69,15 +76,25 @@ export default function DatasetsPanel({ isCollapsed }: DatasetsPanelProps) {
       toast.error("User UID not found. Cannot delete dataset.");
       return;
     }
-    await removeDataset(id, user_uid);
-    const remaining = datasets.filter((d) => d.id !== id);
-    setDatasets(remaining);
 
-    if (activeDataset?.id === id) {
-      setActiveDataset(remaining.length > 0 ? remaining[0] : null);
-      customerCtx?.setCustomerData([]);
+    setDeletingId(id);
+    const toastId = toast.loading("Deleting dataset...");
+
+    try {
+      await removeDataset(id, user_uid);
+      const remaining = datasets.filter((d) => d.id !== id);
+      setDatasets(remaining);
+
+      if (activeDataset?.id === id) {
+        setActiveDataset(remaining.length > 0 ? remaining[0] : null);
+        customerCtx?.setCustomerData([]);
+      }
+      toast.success("Dataset deleted.", { id: toastId });
+    } catch (err: any) {
+      toast.error(err.message || "Failed to delete dataset.", { id: toastId });
+    } finally {
+      setDeletingId(null);
     }
-    toast.success("Dataset deleted.");
   };
 
   return (
@@ -100,7 +117,8 @@ export default function DatasetsPanel({ isCollapsed }: DatasetsPanelProps) {
         datasets={datasets}
         activeDatasetId={activeDataset?.id ?? null}
         isCollapsed={isCollapsed}
-        canDelete={datasets.length >= 1}
+        canDelete={datasets.length >= 1 && !deletingId}
+        deletingId={deletingId}
         onSelect={handleSelectDataset}
         onDelete={handleDeleteDataset}
       />

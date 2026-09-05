@@ -6,11 +6,13 @@ import AppLayout from './layouts/AppLayout';
 // 1. Import your page components
 import OptimicStudio from './OptimicStudio';
 import SettingsView from './Settings';
+import Analyse from './analyse/Analyse';
 
 // 2. Component Lookup Map (id -> Component)
 const VIEWS: Record<string, React.ComponentType> = {
   'dashboard': OptimicStudio,
   'settings': SettingsView,
+  "agent-analytics": Analyse,
 };
 
 // Default fallback for sections you haven't created yet
