@@ -1,10 +1,9 @@
-import { TrendingUp, Megaphone, Settings, WandSparkles } from "lucide-react";
+import { TrendingUp, Settings, WandSparkles, ClipboardMinus } from "lucide-react";
 
 export const NAV_ITEMS = [
   { id: "dashboard", label: "Studio", icon: WandSparkles },
   { id: "agent-analytics", label: "Agent Analytics", icon: TrendingUp },
-  { id: "active-campaigns", label: "Active Campaigns", icon: Megaphone },
-  { id: "settings", label: "Settings", icon: Settings, hasDivider: true },
+  { id: "reports", label: "Agent Reports", icon: ClipboardMinus },
 ];
 
 // Data Viewer Constants
@@ -46,4 +45,13 @@ export const SUGGESTED_QUESTIONS = [
   "Show trend over time",
   "Breakdown of order counts",
   "Top 5 highest performing items",
+];
+
+
+
+// Reports
+export const REPORT_TYPES = [
+  { id: "Executive Performance Summary", desc: "Overall business health, volume, and revenue drivers" },
+  { id: "Customer & Segment Audit", desc: "VIP clients, order frequency, and retention opportunities" },
+  { id: "Product & Category Deep-Dive", desc: "Best-selling lines, unit pricing, and inventory velocity" },
 ];

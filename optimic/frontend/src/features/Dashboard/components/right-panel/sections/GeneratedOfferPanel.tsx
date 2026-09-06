@@ -36,8 +36,7 @@ export default function GeneratedOfferPanel({
     // Implement the logic to send the offer to the selected customers
     // This could involve calling an API endpoint or performing some action
     toast.success(`Comming Soon ...`);
-    
-  }
+  };
 
   return (
     <div className="h-full flex flex-col gap-3 bg-white">
@@ -91,23 +90,15 @@ export default function GeneratedOfferPanel({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1.5">
             <Award className="w-4 h-4 text-orange-600 shrink-0" />
-            <span className="font-bold text-orange-950 text-[14px]">Offer Score</span>
+            <span className="font-bold text-orange-950 text-[14px]">
+              Offer Score
+            </span>
           </div>
         </div>
         <p className="items-center px-2 py-0.5 rounded-md bg-orange-100 text-orange-800 font-bold text-[12px] border border-orange-200">
           {offerResult?.score || "N/A"}
         </p>
       </div>
-
-      {/* Action CTA */}
-      <button
-        type="button"
-        className="mt-auto h-11 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs shadow-xs disabled:opacity-40 disabled:pointer-events-none transition-all cursor-pointer"
-        disabled={!hasOffer || selectedCount === 0 || isGenerating}
-        onClick={sendOffre}
-      >
-        Batch Send ({selectedCount})
-      </button>
     </div>
   );
 }
