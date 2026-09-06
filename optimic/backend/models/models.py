@@ -66,3 +66,13 @@ class UserData(BaseModel):
     email: str = "no email"
     name: str = "no full name"
     user_uid: str = "no uid"
+
+# Report Model
+class ReportData(BaseModel):
+    user_uid: str = "thread-1"
+    report_type: str = ""
+    report_data: str = ""
+    rows: list = []
+    headers: list = []
+    dataset_name: str = "no name"
+    dataset_id: str = "no id"

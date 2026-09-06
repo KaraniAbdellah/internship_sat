@@ -15,8 +15,9 @@ from chatbot import (
     process_data_into_qdrant,
     clear_chat_history
 )
+from reports import generate_dataset_report
 from anaylse import run_dataset_analysis
-from models.models import ChatData, MarketingData, UploadData, UserData, AnalyseData
+from models.models import ChatData, MarketingData, UploadData, UserData, AnalyseData, ReportData
 from state import DeleteDatasetData
 
 
@@ -222,3 +223,23 @@ async def analyse_dataset(data: AnalyseData, request: Request):
     )
 
     return result
+
+
+@app.post("/report")
+async def generate_report(data: ReportData, request: Request):
+    if not data.headers or not data.rows:
+        raise HTTPException(
+            status_code=400,
+            detail="The active dataset contains no rows or columns to analyze."
+        )
+
+    try:
+        result = await generate_dataset_report(
+            headers=data.headers,
+            rows=data.rows,
+            dataset_name=data.dataset_name,
+            report_type=data.report_type,
+        )
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Report error: {str(e)}")
