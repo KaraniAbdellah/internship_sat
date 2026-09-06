@@ -1,13 +1,19 @@
 import os
 import sqlite3
 import uuid
+
 from dotenv import dotenv_values
 from groq import Groq
+from langchain.agents import create_agent
+from langchain.agents.middleware import SummarizationMiddleware
 from langchain_core.messages import HumanMessage, SystemMessage
+from langgraph.checkpoint.memory import InMemorySaver
 from qdrant_client import QdrantClient, models
 from qdrant_client.http.exceptions import UnexpectedResponse
 from qdrant_client.http.models import Document, FusionQuery, PointStruct
 from state import fast_llm
+
+
 
 # Load prompt safely
 CHATBOT_PROMPT = ""
@@ -32,8 +38,22 @@ client_qdrant = QdrantClient(
     timeout=60,
 )
 
+
 # Connect to Groq
 client_groq = Groq(api_key=GROQ_API_KEY)
+
+
+# Create Agent
+agent = create_agent(
+    model=fast_llm,
+    tools=[],
+    middleware=[
+        SummarizationMiddleware(
+            model=fast_llm, trigger=("tokens", 2000), keep=("messages", 10)
+        )
+    ],
+    checkpointer=InMemorySaver(),
+)
 
 
 # def init_chats_db():
@@ -129,10 +149,9 @@ def initialize_chatbot(user_uid: str):
         pass
 
 
-
 def add_doc_qdrant_cloud(rows: list, headers: list, payload: dict, user_uid: str):
     print("Adding documents to Qdrant Cloud...")
-    
+
     for row in rows:
         doc = ""
         for header, value in zip(headers, row):
@@ -162,8 +181,9 @@ def add_doc_qdrant_cloud(rows: list, headers: list, payload: dict, user_uid: str
         )
 
 
-
-def process_data_into_qdrant(rows: list[list[str]], headers: list[str], dataset_id: str, user_uid: str):
+def process_data_into_qdrant(
+    rows: list[list[str]], headers: list[str], dataset_id: str, user_uid: str
+):
     print("Processing data into Qdrant...")
     payload = {"dataset_id": dataset_id, "user_uid": user_uid}
     add_doc_qdrant_cloud(rows, headers, payload, user_uid)
@@ -220,7 +240,7 @@ def get_relevant_chunks_from_qdrant(
         return ""
 
 
-def generate_response(question: str, context: str) -> str:
+def generate_response(question: str, context: str, user_uid: str) -> str:
     sys_prompt = CHATBOT_PROMPT
     message = f"""
         Question: {question}
@@ -231,18 +251,19 @@ def generate_response(question: str, context: str) -> str:
         SystemMessage(content=sys_prompt),
         HumanMessage(content=message),
     ]
+    thread_config = {"configurable": {"thread_id": user_uid}}
+    response = agent.invoke(
+        {"messages": messages},
+        thread_config,
+    )["messages"][-1].content
+    print(response)
 
-    res = []
-    for chunk in fast_llm.stream(messages):
-        if chunk.content:
-            res.append(chunk.content)
-
-    return "".join(res)
+    return response
 
 
 def get_response_from_qdrant(user_uid: str, dataset_id: str, question: str) -> str:
     relevant_chunks = get_relevant_chunks_from_qdrant(question, dataset_id, user_uid)
-    return generate_response(question, relevant_chunks)
+    return generate_response(question, relevant_chunks, user_uid)
 
 
 def delete_dataset_from_qdrant(dataset_id: str, user_uid: str):
@@ -268,6 +289,3 @@ def delete_dataset_from_qdrant(dataset_id: str, user_uid: str):
         print("Dataset deleted successfully from Qdrant.")
     except Exception as e:
         print(f"Failed to delete dataset: {e}")
-
-
-
