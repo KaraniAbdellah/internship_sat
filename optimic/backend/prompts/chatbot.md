@@ -7,4 +7,3 @@ Answer the user's question directly and concisely using ONLY the provided contex
 - If the answer cannot be found in the context, reply: "Not enough information in context."
 - Always respond in the same language as the user's question.
 - Keep the response direct.
-

@@ -12,6 +12,7 @@ import {
   askQuestion,
   startChatWithDataset,
   makeDatasetActive,
+  clearChatHistory,
 } from "@/features/Dashboard/services/chatBot";
 import UserDataContext from "@/global/context/UserDataContext";
 
@@ -26,6 +27,7 @@ export default function ChatDatasetPanel() {
   const [inputValue, setInputValue] = useState("");
   const [isUploading, setIsUploading] = useState(false);
   const [isThinking, setIsThinking] = useState(false);
+  const [isClearing, setIsClearing] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const datasetCtx = useContext(DatasetContext);
@@ -46,12 +48,21 @@ export default function ChatDatasetPanel() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isThinking]);
 
-  // Clear chat state locally
-  const handleClearChat = () => {
-    if (messages.length === 0) return;
-    setMessages([]);
-    setInputValue("");
-    setIsThinking(false);
+  // Clear chat state locally and on backend
+  const handleClearChat = async () => {
+    if (messages.length === 0 || isClearing) return;
+
+    setIsClearing(true);
+    try {
+      await clearChatHistory();
+      setMessages([]);
+      setInputValue("");
+      setIsThinking(false);
+    } catch (error) {
+      console.error("Error clearing chat history:", error);
+    } finally {
+      setIsClearing(false);
+    }
   };
 
   const uploadDataset = async () => {
@@ -185,11 +196,16 @@ export default function ChatDatasetPanel() {
             <button
               type="button"
               onClick={handleClearChat}
+              disabled={isClearing}
               title="Clear chat history"
               aria-label="Clear chat messages"
-              className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-rose-50 hover:text-rose-600 focus-visible:outline-2 focus-visible:outline-rose-500"
+              className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-rose-50 hover:text-rose-600 disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-rose-500"
             >
-              <Trash2 className="h-4 w-4" />
+              {isClearing ? (
+                <Loader2 className="h-4 w-4 animate-spin text-rose-500" />
+              ) : (
+                <Trash2 className="h-4 w-4" />
+              )}
             </button>
           )}
         </div>
@@ -271,7 +287,7 @@ export default function ChatDatasetPanel() {
           disabled={!isReady || isThinking}
           placeholder={
             isReady
-              ? "Ask about totals, trends, or segments..."
+              ? "Ask about top 3 clients or top 3 segments..."
               : "Connect dataset above to enable chat..."
           }
           className="w-full h-11 pl-3.5 pr-3 rounded-xl border border-slate-200 bg-white text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 disabled:bg-slate-50 disabled:text-slate-400 disabled:cursor-not-allowed transition-all"

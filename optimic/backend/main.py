@@ -13,6 +13,7 @@ from chatbot import (
     get_user_dataset_record,
     initialize_chatbot,
     process_data_into_qdrant,
+    clear_chat_history
 )
 from anaylse import run_dataset_analysis
 from models.models import ChatData, MarketingData, UploadData, UserData, AnalyseData
@@ -167,6 +168,16 @@ async def ask_question(data: ChatData, request: Request):
         "question": data.question,
         "response": answer,
     }
+
+@app.delete("/clear-chat-history")
+async def clear_chat_history_endpoint(request: Request):
+    user = request.state.user
+    user_uid = user["uid"]
+
+    # Clears state for this specific user's conversation thread
+    await clear_chat_history(thread_id=user_uid)
+    print(f"Chat history cleared for user {user_uid}")
+    return {"message": "Chat history cleared successfully"}
 
 
 @app.post("/delete-dataset")

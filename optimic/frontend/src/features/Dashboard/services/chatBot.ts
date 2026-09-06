@@ -62,6 +62,7 @@ async function askQuestion(question: string, user_uid: string, dataset_id: strin
     throw error;
   }
 }
+
 async function makeDatasetActive(datasetId: string): Promise<void> {
   const db = await openDatabase();
   return new Promise((resolve, reject) => {
@@ -83,5 +84,23 @@ async function makeDatasetActive(datasetId: string): Promise<void> {
 }
 
 
+async function clearChatHistory() {
+  try {
+    const response = await fetch(`${API_BASE_URL}/clear-chat-history`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    });
 
-export { startChatWithDataset, askQuestion, makeDatasetActive };
+    if (!response.ok) {
+      throw new Error(`Server returned ${response.status}`);
+    }
+  } catch (error) {
+    console.error("Error clearing chat history:", error);
+  }
+}
+
+
+export { startChatWithDataset, askQuestion, makeDatasetActive, clearChatHistory };

@@ -12,14 +12,11 @@ from qdrant_client import QdrantClient, models
 from qdrant_client.http.exceptions import UnexpectedResponse
 from qdrant_client.http.models import Document, FusionQuery, PointStruct
 from state import fast_llm
+from langchain_core.messages import RemoveMessage
+from langgraph.graph.message import REMOVE_ALL_MESSAGES
+from state import CHATBOT_PROMPT
 
 
-
-# Load prompt safely
-CHATBOT_PROMPT = ""
-if os.path.exists("./prompts/chatbot.md"):
-    with open("./prompts/chatbot.md", "r", encoding="utf-8") as f:
-        CHATBOT_PROMPT = f.read()
 
 # Load environment variables
 config = dotenv_values(".env")
@@ -264,6 +261,16 @@ def generate_response(question: str, context: str, user_uid: str) -> str:
 def get_response_from_qdrant(user_uid: str, dataset_id: str, question: str) -> str:
     relevant_chunks = get_relevant_chunks_from_qdrant(question, dataset_id, user_uid)
     return generate_response(question, relevant_chunks, user_uid)
+
+
+async def clear_chat_history(thread_id: str):
+    config = {"configurable": {"thread_id": thread_id}}
+
+    # Update the graph state directly using the special REMOVE_ALL_MESSAGES marker
+    await agent.aupdate_state(
+        config,
+        {"messages": [RemoveMessage(id=REMOVE_ALL_MESSAGES)]},
+    )
 
 
 def delete_dataset_from_qdrant(dataset_id: str, user_uid: str):
