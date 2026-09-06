@@ -1,4 +1,6 @@
 import { useContext, useState, useRef, useEffect } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import {
   Database,
   Zap,
@@ -48,7 +50,7 @@ export default function ChatDatasetPanel() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isThinking]);
 
-  // Clear chat state locally and on backend
+  // Clear chat state locally and on backend with loading feedback
   const handleClearChat = async () => {
     if (messages.length === 0 || isClearing) return;
 
@@ -257,9 +259,58 @@ export default function ChatDatasetPanel() {
             ) : (
               <div
                 key={msg.id}
-                className="self-start rounded-2xl border border-slate-200/90 bg-white px-4 py-3 text-xs text-slate-800 font-medium leading-relaxed max-w-[90%] shadow-xs"
+                className="self-start rounded-2xl border border-slate-200/90 bg-white
+                px-3 py-1 text-xs text-slate-800 font-medium leading-relaxed max-w-[90%]
+                shadow-xs overflow-x-auto"
               >
-                {msg.text}
+                <ReactMarkdown
+                  remarkPlugins={[remarkGfm]}
+                  components={{
+                    p: ({ children }) => (
+                      <p className="mb-2 last:mb-0 leading-relaxed">{children}</p>
+                    ),
+                    ul: ({ children }) => (
+                      <ul className="list-disc pl-4 mb-2 space-y-1">{children}</ul>
+                    ),
+                    ol: ({ children }) => (
+                      <ol className="list-decimal pl-4 mb-2 space-y-1">{children}</ol>
+                    ),
+                    li: ({ children }) => (
+                      <li className="leading-relaxed">{children}</li>
+                    ),
+                    strong: ({ children }) => (
+                      <strong className="font-bold text-slate-950">{children}</strong>
+                    ),
+                    table: ({ children }) => (
+                      <div className="my-2 overflow-x-auto rounded-lg border border-slate-200">
+                        <table className="min-w-full divide-y divide-slate-200 text-left text-xs">
+                          {children}
+                        </table>
+                      </div>
+                    ),
+                    thead: ({ children }) => (
+                      <thead className="bg-slate-50 text-slate-700 font-semibold">{children}</thead>
+                    ),
+                    th: ({ children }) => (
+                      <th className="px-3 py-1.5 border-b border-slate-200 text-[11px] uppercase tracking-wider">{children}</th>
+                    ),
+                    td: ({ children }) => (
+                      <td className="px-3 py-1.5 border-b border-slate-100">{children}</td>
+                    ),
+                    code: ({ children }) => (
+                      <code className="rounded bg-slate-100 px-1 py-0.5 font-mono text-[11px] text-orange-600 font-semibold">
+                        {children}
+                      </code>
+                    ),
+                    pre: ({ children }) => (
+                      <pre className="my-2 overflow-x-auto rounded-lg bg-slate-900 p-3 text-[11px] text-slate-100 font-mono">
+                        {children}
+                      </pre>
+                    ),
+                  }}
+                >
+                  {msg.text}
+                </ReactMarkdown>
               </div>
             ),
           )
