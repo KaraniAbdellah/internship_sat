@@ -79,7 +79,7 @@ export async function removeDataset(id: string, userUid: string): Promise<void> 
       dataset_id: id,
       user_uid: userUid,
     }),
-  }); 
+  });
 
   if (!res.ok) {
     const errorBody = await res.json().catch(() => ({}));
@@ -96,4 +96,3 @@ export async function removeDataset(id: string, userUid: string): Promise<void> 
     tx.onerror = () => reject(tx.error);
   });
 }
-

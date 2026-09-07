@@ -9,7 +9,6 @@ import { persistDataset, removeDataset } from "../../services/datasetDb";
 import DatasetsPanelHeader from "./DatasetsPanelHeader";
 import DatasetList from "./DatasetList";
 import UserDataContext from "@/global/context/UserDataContext";
-
 type DatasetsPanelProps = {
   isCollapsed: boolean;
 };
@@ -17,6 +16,7 @@ type DatasetsPanelProps = {
 export default function DatasetsPanel({ isCollapsed }: DatasetsPanelProps) {
   const datasetCtx = useContext(DatasetContext);
   const customerCtx = useContext(CustomerDataContext);
+
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const userCtx = useContext(UserDataContext);
 
@@ -36,6 +36,7 @@ export default function DatasetsPanel({ isCollapsed }: DatasetsPanelProps) {
       const { headers, rows } = parseCSV(text);
 
       const newDataset: DatasetType = {
+        user_uid: userCtx.uid,
         id: `ds_${Date.now()}`,
         name: file.name,
         headers,
