@@ -4,6 +4,7 @@ import { DatasetType } from "@/global/types/DatasetType";
 import { SUGGESTED_QUESTIONS } from "@/features/Dashboard/constants/conts";
 import { ChartData } from "@/features/Dashboard/services/analyseService";
 import { InteractiveChartCard } from "./InteractiveChartCard";
+import { p } from "framer-motion/m";
 
 export interface Message {
   sender: "user" | "agent";
@@ -17,7 +18,7 @@ interface Props {
   loading: boolean;
   activeDataset: DatasetType | null;
   onSelectPrompt: (prompt: string) => void;
-  endRef: RefObject<HTMLDivElement>;
+  endRef: RefObject<HTMLDivElement | null>;
 }
 
 export const AnalyseChatFeed: FC<Props> = ({
@@ -85,7 +86,9 @@ export const AnalyseChatFeed: FC<Props> = ({
           Compiling DuckDB query & generating charts...
         </div>
       )}
-      <div ref={endRef} />
+
+      {endRef ? <div ref={endRef} /> : <span></span>}
+
     </div>
   );
 };
