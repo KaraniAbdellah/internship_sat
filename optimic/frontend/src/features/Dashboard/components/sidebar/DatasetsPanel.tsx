@@ -36,7 +36,7 @@ export default function DatasetsPanel({ isCollapsed }: DatasetsPanelProps) {
       const { headers, rows } = parseCSV(text);
 
       const newDataset: DatasetType = {
-        user_uid: userCtx?.user_data.uid ?? "",
+        user_uid: userCtx?.user_data?.uid ?? "",
         id: `ds_${Date.now()}`,
         name: file.name,
         headers,
@@ -71,7 +71,7 @@ export default function DatasetsPanel({ isCollapsed }: DatasetsPanelProps) {
     if (deletingId) return;
 
     console.log(`Attempting to delete dataset with ID: ${id}`);
-    const user_uid = userCtx?.user_data.uid;
+    const user_uid = userCtx?.user_data?.uid;
 
     if (!user_uid) {
       toast.error("User UID not found. Cannot delete dataset.");

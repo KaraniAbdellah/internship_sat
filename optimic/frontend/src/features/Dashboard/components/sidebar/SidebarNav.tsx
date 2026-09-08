@@ -20,7 +20,6 @@ export default function SidebarNav({
 
         return (
           <React.Fragment key={item.id}>
-            {item.hasDivider && <hr className="my-2 border-slate-200/80" />}
             <button
               type="button"
               onClick={() => onSelect(item.id)}
