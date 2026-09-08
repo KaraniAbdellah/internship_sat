@@ -11,7 +11,7 @@ const Analyse = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
-  const endRef = useRef<HTMLDivElement>(null);
+  const endRef = useRef<HTMLDivElement | null>(null);
 
   if (!context) {
     return (

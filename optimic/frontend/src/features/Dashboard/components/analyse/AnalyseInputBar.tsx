@@ -1,5 +1,10 @@
-import { Send } from "lucide-react";
+import type {
+  Dispatch,
+  SetStateAction,
+  FormEventHandler,
+} from "react";
 
+import type { DatasetType } from "@/global/types/DatasetType";
 
 export const AnalyseInputBar = ({
   input,
@@ -7,6 +12,12 @@ export const AnalyseInputBar = ({
   onSubmit,
   loading,
   activeDataset,
+}: {
+  input: string;
+  setInput: Dispatch<SetStateAction<string>>;
+  onSubmit: FormEventHandler<HTMLFormElement>;
+  loading: boolean;
+  activeDataset: DatasetType | null;
 }) => {
   return (
     <div className="p-3 sm:p-4 border-t border-gray-200 bg-white">
@@ -14,11 +25,11 @@ export const AnalyseInputBar = ({
       {activeDataset && activeDataset.headers && activeDataset.headers.length > 0 && (
         <div className="max-w-4xl mx-auto mb-2 flex items-center gap-1.5 overflow-x-auto pb-1 text-[11px] text-gray-400 scrollbar-none">
           <span className="shrink-0 font-medium text-gray-500">Columns:</span>
-          {activeDataset.headers.map((col) => (
+          {activeDataset.headers.map((col: any) => (
             <button
               type="button"
               key={col}
-              onClick={() => setInput((prev) => `${prev} ${col}`.trim())}
+              onClick={() => setInput((prev: any) => `${prev} ${col}`.trim())}
               className="bg-gray-100 hover:bg-orange-100 hover:text-orange-700 text-gray-600 px-2 py-0.5 rounded transition shrink-0 font-mono"
               title="Click to append column"
             >

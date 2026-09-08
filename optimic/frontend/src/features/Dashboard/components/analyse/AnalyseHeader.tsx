@@ -1,4 +1,4 @@
-import type { FC, RefObject } from "react";
+import type { FC } from "react";
 import { BarChart3, Database, RotateCcw } from "lucide-react";
 import {DatasetType} from "@/global/types/DatasetType";
 
