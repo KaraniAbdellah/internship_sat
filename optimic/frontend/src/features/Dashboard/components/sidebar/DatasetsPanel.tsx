@@ -18,7 +18,7 @@ export default function DatasetsPanel({ isCollapsed }: DatasetsPanelProps) {
   const customerCtx = useContext(CustomerDataContext);
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const userCtx? = useContext(UserDataContext);
+  const userCtx = useContext(UserDataContext);
 
   // Tracks the ID of the dataset currently being deleted
   const [deletingId, setDeletingId] = useState<string | null>(null);
