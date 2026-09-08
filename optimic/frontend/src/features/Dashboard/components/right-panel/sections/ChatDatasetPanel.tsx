@@ -81,11 +81,11 @@ export default function ChatDatasetPanel() {
       }
 
       await startChatWithDataset(
-        activeDataset.rows,
-        activeDataset.headers,
+        activeDataset.rows ?? [],
+        activeDataset.headers ?? [],
         activeDataset.id,
         activeDataset.name,
-        activeDataset.isActive,
+        activeDataset.isActive ?? false,
         userUid,
       );
 
@@ -267,19 +267,27 @@ export default function ChatDatasetPanel() {
                   remarkPlugins={[remarkGfm]}
                   components={{
                     p: ({ children }) => (
-                      <p className="mb-2 last:mb-0 leading-relaxed">{children}</p>
+                      <p className="mb-2 last:mb-0 leading-relaxed">
+                        {children}
+                      </p>
                     ),
                     ul: ({ children }) => (
-                      <ul className="list-disc pl-4 mb-2 space-y-1">{children}</ul>
+                      <ul className="list-disc pl-4 mb-2 space-y-1">
+                        {children}
+                      </ul>
                     ),
                     ol: ({ children }) => (
-                      <ol className="list-decimal pl-4 mb-2 space-y-1">{children}</ol>
+                      <ol className="list-decimal pl-4 mb-2 space-y-1">
+                        {children}
+                      </ol>
                     ),
                     li: ({ children }) => (
                       <li className="leading-relaxed">{children}</li>
                     ),
                     strong: ({ children }) => (
-                      <strong className="font-bold text-slate-950">{children}</strong>
+                      <strong className="font-bold text-slate-950">
+                        {children}
+                      </strong>
                     ),
                     table: ({ children }) => (
                       <div className="my-2 overflow-x-auto rounded-lg border border-slate-200">
@@ -289,13 +297,19 @@ export default function ChatDatasetPanel() {
                       </div>
                     ),
                     thead: ({ children }) => (
-                      <thead className="bg-slate-50 text-slate-700 font-semibold">{children}</thead>
+                      <thead className="bg-slate-50 text-slate-700 font-semibold">
+                        {children}
+                      </thead>
                     ),
                     th: ({ children }) => (
-                      <th className="px-3 py-1.5 border-b border-slate-200 text-[11px] uppercase tracking-wider">{children}</th>
+                      <th className="px-3 py-1.5 border-b border-slate-200 text-[11px] uppercase tracking-wider">
+                        {children}
+                      </th>
                     ),
                     td: ({ children }) => (
-                      <td className="px-3 py-1.5 border-b border-slate-100">{children}</td>
+                      <td className="px-3 py-1.5 border-b border-slate-100">
+                        {children}
+                      </td>
                     ),
                     code: ({ children }) => (
                       <code className="rounded bg-slate-100 px-1 py-0.5 font-mono text-[11px] text-orange-600 font-semibold">
