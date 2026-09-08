@@ -1,4 +1,4 @@
-import { TrendingUp, Settings, WandSparkles, ClipboardMinus } from "lucide-react";
+import { TrendingUp, WandSparkles, ClipboardMinus } from "lucide-react";
 
 export const NAV_ITEMS = [
   { id: "dashboard", label: "Studio", icon: WandSparkles },

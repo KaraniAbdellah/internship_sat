@@ -1,6 +1,6 @@
 export type DatasetType = {
-  id: string;          // e.g. "ds_172398234"
   user_uid: string;
+  id: string;          // e.g. "ds_172398234"
   name: string;        // "liste-notaires-2026.csv"
   rowCount: number;
   policy: string;      // Policy specific to this dataset

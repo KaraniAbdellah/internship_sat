@@ -36,7 +36,7 @@ export default function DatasetsPanel({ isCollapsed }: DatasetsPanelProps) {
       const { headers, rows } = parseCSV(text);
 
       const newDataset: DatasetType = {
-        user_uid: userCtx?.uid,
+        user_uid: userCtx?.user_data.uid ?? "",
         id: `ds_${Date.now()}`,
         name: file.name,
         headers,
