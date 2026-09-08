@@ -1,15 +1,8 @@
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Copy, Check, TrendingUp, CheckCircle2 } from "lucide-react";
-import { ReportResult } from "./reportService";
 
-interface ReportViewProps {
-  report: ReportResult;
-  onCopy: () => void;
-  copied: boolean;
-}
-
-export default function ReportView({ report, onCopy, copied }: ReportViewProps) {
+export default function ReportView({ report, onCopy, copied }) {
   return (
     <div className="flex flex-col gap-6 bg-white border border-slate-200 rounded-3xl p-6 shadow-xs">
       {/* Header */}

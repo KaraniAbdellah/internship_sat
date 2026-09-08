@@ -1,16 +1,7 @@
-import React from "react";
 import { Send } from "lucide-react";
-import { DatasetType } from "@/global/context/DatasetContext";
 
-interface Props {
-  input: string;
-  setInput: React.Dispatch<React.SetStateAction<string>>;
-  onSubmit: (e: React.FormEvent) => void;
-  loading: boolean;
-  activeDataset: DatasetType | null;
-}
 
-export const AnalyseInputBar: React.FC<Props> = ({
+export const AnalyseInputBar = ({
   input,
   setInput,
   onSubmit,

@@ -6,7 +6,7 @@ import { AnalyseHeader } from "./AnalyseHeader";
 import { AnalyseChatFeed, Message } from "./AnalyseChatFeed";
 import { AnalyseInputBar } from "./AnalyseInputBar";
 
-const Analyse: React.FC = () => {
+const Analyse = () => {
   const context = useContext(DatasetContext);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
