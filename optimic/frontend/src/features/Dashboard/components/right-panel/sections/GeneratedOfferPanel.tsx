@@ -1,6 +1,5 @@
 import { Copy, Check, Loader2, Sparkles, Award } from "lucide-react";
 import { useState, useContext } from "react";
-import toast from "react-hot-toast";
 
 import { OfferResultType } from "@/global/types/OfferResultType";
 import { OfferResultContext } from "@/global/context/OfferResultContext";

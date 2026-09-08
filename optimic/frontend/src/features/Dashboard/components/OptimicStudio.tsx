@@ -7,13 +7,10 @@ import StudioWorkspaceLayout from "./layouts/StudioWorkspaceLayout";
 import RightSidebar from "./right-panel/RightSidebar";
 
 import { DatasetContext } from "@/global/context/DatasetContext";
-import { CustomerDataContext } from "@/global/context/CustomerDataContext";
 import { getStoredDatasets } from "../services/datasetDb";
 
 export default function OptimicStudio() {
   const datasetCtx = useContext(DatasetContext);
-  const customerCtx = useContext(CustomerDataContext);
-
 
   useEffect(() => {
     async function hydrateDB() {
