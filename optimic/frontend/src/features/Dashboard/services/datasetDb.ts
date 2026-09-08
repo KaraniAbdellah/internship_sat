@@ -16,19 +16,32 @@ export const openDatabase = (): Promise<IDBDatabase> => {
     request.onsuccess = () => resolve(request.result);
     request.onerror = () => reject(request.error);
   });
-}
+};
 
-export async function getStoredDatasets(): Promise<DatasetType[]> {
+export async function getStoredDatasets(
+  userUid: string,
+): Promise<DatasetType[]> {
   const db = await openDatabase();
+
   return new Promise((resolve, reject) => {
     const tx = db.transaction(DB_CONFIG.STORE, "readonly");
     const store = tx.objectStore(DB_CONFIG.STORE);
     const req = store.getAll();
 
-    req.onsuccess = () => resolve(req.result || []);
+    req.onsuccess = () => {
+      const datasets = req.result || [];
+
+      const filteredDatasets = datasets.filter(
+        (dataset: DatasetType) => dataset.user_uid === userUid,
+      );
+
+      resolve(filteredDatasets);
+    };
+
     req.onerror = () => reject(req.error);
   });
 }
+
 
 export async function persistDataset(dataset: DatasetType): Promise<void> {
   const db = await openDatabase();
@@ -61,11 +74,14 @@ export async function persistPolicy(id: string, policy: string): Promise<void> {
   });
 }
 
-
-
-export async function removeDataset(id: string, userUid: string): Promise<void> {
+export async function removeDataset(
+  id: string,
+  userUid: string,
+): Promise<void> {
   const db = await openDatabase();
-  console.log(`Attempting to delete dataset with ID: ${id} for user UID: ${userUid}`);
+  console.log(
+    `Attempting to delete dataset with ID: ${id} for user UID: ${userUid}`,
+  );
 
   // 1. Call backend API to delete from Qdrant
   const res = await fetch(`${API_KEY}/delete-dataset`, {
@@ -83,7 +99,9 @@ export async function removeDataset(id: string, userUid: string): Promise<void> 
 
   if (!res.ok) {
     const errorBody = await res.json().catch(() => ({}));
-    throw new Error(errorBody.message || `Failed to delete dataset: ${res.statusText}`);
+    throw new Error(
+      errorBody.message || `Failed to delete dataset: ${res.statusText}`,
+    );
   }
 
   // 2. Delete from local IndexedDB only after remote deletion succeeds

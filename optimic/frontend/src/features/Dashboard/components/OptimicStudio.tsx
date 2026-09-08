@@ -6,16 +6,20 @@ import StudioPageLayout from "./layouts/StudioPageLayout";
 import StudioWorkspaceLayout from "./layouts/StudioWorkspaceLayout";
 import RightSidebar from "./right-panel/RightSidebar";
 
-import { DatasetContext } from "@/global/context/DatasetContext";
+import { DatasetContext,  } from "@/global/context/DatasetContext";
 import { getStoredDatasets } from "../services/datasetDb";
+import UserDataContext from "@/global/context/UserDataContext";
 
 export default function OptimicStudio() {
   const datasetCtx = useContext(DatasetContext);
-
+  const userCtx = useContext(UserDataContext);
+  
   useEffect(() => {
     async function hydrateDB() {
+      console.log("Hydrating database with stored datasets...");
+      const userUid = userCtx?.user_data?.uid;
       try {
-        const stored = await getStoredDatasets();
+        const stored = await getStoredDatasets(userUid);
         if (stored.length > 0 && datasetCtx) {
           datasetCtx.setDatasets(stored);
           datasetCtx.setActiveDataset(stored[0]);

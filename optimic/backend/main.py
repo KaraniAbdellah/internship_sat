@@ -1,5 +1,6 @@
 from fastapi import FastAPI, HTTPException, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
+import os
 
 from agents import compile_state_graph
 
@@ -79,12 +80,13 @@ def hello_world():
 def authenticate_user(user_data: UserData, response: Response):
     user = get_or_create_user(user_data.email, user_data.name)
     token = create_token(user)
+    print("Generated token:", token)
 
     response.set_cookie(
         key="auth_token",
         value=token,
         httponly=True,
-        secure=False,
+        secure=os.getenv("MODE_TYPE") == "production",
         samesite="lax",
         max_age=TOKEN_EXPIRE_DAYS * 86400,
     )
