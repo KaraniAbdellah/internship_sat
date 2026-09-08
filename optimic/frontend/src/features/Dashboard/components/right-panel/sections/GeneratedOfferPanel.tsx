@@ -8,13 +8,11 @@ import { OfferResultContext } from "@/global/context/OfferResultContext";
 type GeneratedOfferPanelProps = {
   offerResult?: OfferResultType | null;
   isGenerating?: boolean;
-  selectedCount?: number;
 };
 
 export default function GeneratedOfferPanel({
   offerResult: propOfferResult,
   isGenerating: propIsGenerating,
-  selectedCount = 0,
 }: GeneratedOfferPanelProps) {
   const offerCtx = useContext(OfferResultContext);
 
@@ -30,12 +28,6 @@ export default function GeneratedOfferPanel({
     navigator.clipboard.writeText(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
-  };
-
-  const sendOffre = () => {
-    // Implement the logic to send the offer to the selected customers
-    // This could involve calling an API endpoint or performing some action
-    toast.success(`Comming Soon ...`);
   };
 
   return (
