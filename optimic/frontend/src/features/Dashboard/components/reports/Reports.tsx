@@ -5,13 +5,12 @@ import UserDataContext from "@/global/context/UserDataContext";
 import { generateReport, ReportResult } from "@/features/Dashboard/services/reportsService";
 import ReportView from "./ReportView";
 import { REPORT_TYPES } from "@/features/Dashboard/constants/conts";
-import { DatasetType } from "@/global/types/DatasetType";
 
 
 export default function Reports() {
   const datasetCtx = useContext(DatasetContext);
   const user = useContext(UserDataContext);
-  const activeDataset: DatasetType | null = datasetCtx?.activeDataset;
+  const activeDataset = datasetCtx?.activeDataset;
 
   const [selectedType, setSelectedType] = useState<string>(REPORT_TYPES[0].id);
   const [isGenerating, setIsGenerating] = useState<boolean>(false);

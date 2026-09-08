@@ -3,7 +3,7 @@ import type {
   SetStateAction,
   FormEventHandler,
 } from "react";
-
+import { Send } from "lucide-react";
 import type { DatasetType } from "@/global/types/DatasetType";
 
 export const AnalyseInputBar = ({

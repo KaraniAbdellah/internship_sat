@@ -4,7 +4,6 @@ import { DatasetType } from "@/global/types/DatasetType";
 import { SUGGESTED_QUESTIONS } from "@/features/Dashboard/constants/conts";
 import { ChartData } from "@/features/Dashboard/services/analyseService";
 import { InteractiveChartCard } from "./InteractiveChartCard";
-import { p } from "framer-motion/m";
 
 export interface Message {
   sender: "user" | "agent";
