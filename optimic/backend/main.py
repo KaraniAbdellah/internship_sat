@@ -18,7 +18,7 @@ from chatbot import (
 )
 from reports import generate_dataset_report
 from anaylse import run_dataset_analysis
-from models.models import ChatData, MarketingData, UploadData, UserData, AnalyseData, ReportData
+from models import ChatData, MarketingData, UploadData, UserData, AnalyseData, ReportData
 from state import DeleteDatasetData
 
 
@@ -28,6 +28,7 @@ app = FastAPI()
 origins = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
+    "http://127.0.0.1:8080",
     "https://internship-sat.vercel.app",
 ]
 

@@ -1,7 +1,6 @@
 # this file for prevent "Resolving Circular Imports in Python"
 from langchain_groq import ChatGroq
-from langchain_google_genai import ChatGoogleGenerativeAI
-from typing_extensions import TypedDict, Literal, List
+from typing_extensions import TypedDict, Literal
 import os
 from dotenv import load_dotenv
 from langgraph.graph.message import add_messages
