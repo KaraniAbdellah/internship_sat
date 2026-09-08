@@ -4,11 +4,9 @@ import ChatDatasetPanel from "./sections/ChatDatasetPanel";
 import GeneratedOfferPanel from "./sections/GeneratedOfferPanel";
 import { TABS } from "../../constants/conts";
 
-type RightSidebarProps = {
-  selectedCount?: number;
-};
 
-export default function RightSidebar({ selectedCount = 0 }: RightSidebarProps) {
+
+export default function RightSidebar() {
   const [activeTab, setActiveTab] = useState("dataset-chat");
 
   return (
@@ -41,7 +39,7 @@ export default function RightSidebar({ selectedCount = 0 }: RightSidebarProps) {
         </div>
 
         <div className={`h-full flex-col ${activeTab === "offer-studio" ? "flex" : "hidden"}`}>
-          <GeneratedOfferPanel selectedCount={selectedCount} />
+          <GeneratedOfferPanel />
         </div>
       </div>
     </aside>

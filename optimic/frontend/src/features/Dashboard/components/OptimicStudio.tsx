@@ -14,7 +14,6 @@ export default function OptimicStudio() {
   const datasetCtx = useContext(DatasetContext);
   const customerCtx = useContext(CustomerDataContext);
 
-  const selectedCount = customerCtx?.customerData?.length || 0;
 
   useEffect(() => {
     async function hydrateDB() {
@@ -36,7 +35,7 @@ export default function OptimicStudio() {
       workspace={
         <StudioWorkspaceLayout
           centerArea={<DatasetWorkspace />}
-          rightSidebar={<RightSidebar selectedCount={selectedCount} />}
+          rightSidebar={<RightSidebar />}
         />
       }
     />
