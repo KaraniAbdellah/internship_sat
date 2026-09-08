@@ -28,7 +28,12 @@ export default function Reports() {
       const data = await generateReport({
         userUid: user?.user_data?.uid,
         reportType: selectedType,
-        dataset: activeDataset,
+        dataset: {
+          id: activeDataset.id,
+          name: activeDataset.name,
+          rows: activeDataset.rows ?? [],
+          headers: activeDataset.headers ?? [],
+        },
       });
       setReport(data);
     } catch (error: any) {
