@@ -1,4 +1,4 @@
-import React, { useState, useContext, useRef, useEffect } from "react";
+import { useState, useContext, useRef, useEffect } from "react";
 import { AlertCircle } from "lucide-react";
 import { DatasetContext } from "@/global/context/DatasetContext";
 import { executeDatasetAnalysis } from "@/features/Dashboard/services/analyseService";
@@ -51,7 +51,7 @@ const Analyse = () => {
       return;
     }
 
-    setMessages((prev) => [...prev, { sender: "user", text: q }]);
+    setMessages((prev: any) => [...prev, { sender: "user", text: q }]);
     setInput("");
     setLoading(true);
 
@@ -63,7 +63,7 @@ const Analyse = () => {
         dataset_name: activeDataset.name,
       });
 
-      setMessages((prev) => [
+      setMessages((prev: any) => [
         ...prev,
         {
           sender: "agent",
@@ -73,7 +73,7 @@ const Analyse = () => {
         },
       ]);
     } catch (err: any) {
-      setMessages((prev) => [
+      setMessages((prev: any) => [
         ...prev,
         {
           sender: "agent",
@@ -100,14 +100,14 @@ const Analyse = () => {
           messages={messages}
           loading={loading}
           activeDataset={activeDataset}
-          onSelectPrompt={(prompt) => handleSend(prompt)}
+          onSelectPrompt={(prompt: any) => handleSend(prompt)}
           endRef={endRef}
         />
 
         <AnalyseInputBar
           input={input}
           setInput={setInput}
-          onSubmit={(e) => {
+          onSubmit={(e: any) => {
             e.preventDefault();
             handleSend();
           }}

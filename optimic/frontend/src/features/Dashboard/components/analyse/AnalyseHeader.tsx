@@ -1,7 +1,16 @@
+import type { FC, RefObject } from "react";
 import { BarChart3, Database, RotateCcw } from "lucide-react";
+import {DatasetType} from "@/global/types/DatasetType";
 
+interface Props {
+  datasets: DatasetType[];
+  activeDataset: DatasetType | null;
+  onSelectDataset: (id: string) => void;
+  onClearChat: () => void;
+  hasMessages: boolean;
+}
 
-export const AnalyseHeader = ({
+export const AnalyseHeader: FC<Props> = ({
   datasets,
   activeDataset,
   onSelectDataset,

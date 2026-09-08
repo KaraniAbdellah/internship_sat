@@ -1,4 +1,6 @@
+import type { FC, RefObject } from "react";
 import { Sparkles, Loader2, AlertCircle } from "lucide-react";
+import { DatasetType } from "@/global/types/DatasetType";
 import { SUGGESTED_QUESTIONS } from "@/features/Dashboard/constants/conts";
 import { ChartData } from "@/features/Dashboard/services/analyseService";
 import { InteractiveChartCard } from "./InteractiveChartCard";
@@ -10,7 +12,15 @@ export interface Message {
   sql?: string | null;
 }
 
-export const AnalyseChatFeed = ({
+interface Props {
+  messages: Message[];
+  loading: boolean;
+  activeDataset: DatasetType | null;
+  onSelectPrompt: (prompt: string) => void;
+  endRef: RefObject<HTMLDivElement>;
+}
+
+export const AnalyseChatFeed: FC<Props> = ({
   messages,
   loading,
   activeDataset,
@@ -50,7 +60,7 @@ export const AnalyseChatFeed = ({
           </div>
         </div>
       ) : (
-        messages.map((msg: any, idx: any) => (
+        messages.map((msg: Message, idx: number) => (
           <div
             key={idx}
             className={`flex flex-col ${msg.sender === "user" ? "items-end" : "items-start"}`}
