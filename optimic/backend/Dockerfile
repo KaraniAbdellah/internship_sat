@@ -4,7 +4,7 @@ WORKDIR /app/
 
 COPY * /app/
 
-# --no-cache-dir: for not caching the dependencies in the docker image, which will reduce the size of the image
+# --no-cache-dir: do not use cache on this layer, this will reduce the size of the image
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
