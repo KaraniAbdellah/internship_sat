@@ -23,14 +23,12 @@ from state import DeleteDatasetData
 
 
 app = FastAPI()
-# Mount the router under app
 
 origins = [
-    "http://localhost:5173",
-    "http://127.0.0.1:5173",
-    "http://127.0.0.1:8080",
-    "https://internship-sat.vercel.app",
+    "http://localhost:5173/",
+    "http://127.0.0.1:5173/",
 ]
+
 
 app.add_middleware(
     CORSMiddleware,
@@ -86,8 +84,8 @@ def authenticate_user(user_data: UserData, response: Response):
     response.set_cookie(
         key="auth_token",
         value=token,
-        httponly=True,
-        secure=os.getenv("MODE_TYPE") == "production",
+        httponly=True, # this ensures the cookie is not accessible via JavaScript (document.cookie)
+        secure=False,
         samesite="lax",
         max_age=TOKEN_EXPIRE_DAYS * 86400,
     )
@@ -97,6 +95,7 @@ def authenticate_user(user_data: UserData, response: Response):
 
 @app.get("/me")
 def get_me(request: Request):
+    print("User info:", request.state.user)
     return {"user": request.state.user}
 
 
@@ -201,6 +200,7 @@ async def delete_dataset(data: DeleteDatasetData, request: Request):
 
 @app.post("/logout")
 def logout_user(response: Response):
+    is_secure = os.getenv("MODE_TYPE") == "production"
     response.set_cookie(
         "auth_token", "", max_age=0, httponly=True, secure=False, samesite="lax"
     )

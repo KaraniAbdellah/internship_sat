@@ -2,6 +2,7 @@ const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
 // 1. Authenticate & receive HTTP-only cookie
 export const authenticateUser = async (email: string, name: string) => {
+  console.log("Authenticating user with email:", email, "and name:", name);
   const response = await fetch(`${API_URL}/authenticate`, {
     method: "POST",
     headers: {
