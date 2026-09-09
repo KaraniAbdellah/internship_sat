@@ -19,7 +19,7 @@ export const openDatabase = (): Promise<IDBDatabase> => {
 };
 
 export async function getStoredDatasets(
-  userUid: string,
+  userUid: string | undefined,
 ): Promise<DatasetType[]> {
   const db = await openDatabase();
 
