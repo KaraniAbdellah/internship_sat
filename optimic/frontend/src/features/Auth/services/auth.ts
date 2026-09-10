@@ -11,10 +11,13 @@ export const authenticateUser = async (email: string, name: string) => {
     credentials: "include", // Required to receive and store cookie
     body: JSON.stringify({ email, name }),
   });
+  console.log("RESPONSE", response);
 
   if (!response.ok) {
     throw new Error("Authentication failed");
   }
+
+  console.log("Authentication successful, response:", await response.json());
 
   return await response.json();
 };

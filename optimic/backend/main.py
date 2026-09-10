@@ -2,6 +2,8 @@ from fastapi import FastAPI, HTTPException, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 import os
 
+from fastapi.responses import JSONResponse
+
 from agents import compile_state_graph
 
 from auth import TOKEN_EXPIRE_DAYS, create_token, delete_user, get_or_create_user, verify_token
@@ -25,10 +27,9 @@ from state import DeleteDatasetData
 app = FastAPI()
 
 origins = [
-    "http://localhost:5173/",
-    "http://127.0.0.1:5173/",
-    "https://optimic.vercel.app/"
-    "https://optimic.vercel.app"
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "https://optimic.vercel.app",
     "http://optimic.vercel.app"
 ]
 
@@ -84,16 +85,22 @@ def authenticate_user(user_data: UserData, response: Response):
     token = create_token(user)
     print("Generated token:", token)
 
+    content = {
+        "message": "Authentication successful",
+        "user": user,
+    }
+    response = JSONResponse(content=content)
+
     response.set_cookie(
         key="auth_token",
         value=token,
-        httponly=True, # this ensures the cookie is not accessible via JavaScript (document.cookie)
-        secure=False,
-        samesite="lax",
+        secure=True,  # Set to True in production
+        httponly=True, # Set to True to prevent access from JavaScript
+        samesite="None", # for limit cookie sending in cross-site requests not same site
         max_age=TOKEN_EXPIRE_DAYS * 86400,
     )
 
-    return {"message": "Authentication successful", "user": user}
+    return response
 
 
 @app.get("/me")
