@@ -100,8 +100,13 @@ docker push mccdockerfastapi42.azurecr.io/mcc-backend:v0
 ---
 
 ## Docker Notes
+- **Big Picture**: Dockerfile → Image → Container.
+- **Docker Layers**: Each Line in Dockerfile is Layer. this file like a stack
+- **Docker Cache**: When you build the same Docker image multiple times. very important to use cache for not download dependcies again and again.
+    - Example: 
+        RUN pip install --no-cache-dir -r requirements.txt: this **--no-cache-dir** for skip this layer.
 
-- Dockerfile → Image → Container.
+    - SOURCE: https://docs.docker.com/build/cache/
 
 ---
 

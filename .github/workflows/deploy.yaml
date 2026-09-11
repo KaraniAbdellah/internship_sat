@@ -1,0 +1,12 @@
+# Name for the workflow
+name: Deploy API To GCP
+
+# When to run the workflow
+on:
+  push:
+    branches: [main]
+
+# Define the jobs to run
+jobs:
+  build:
+    name: Build Docker Image
