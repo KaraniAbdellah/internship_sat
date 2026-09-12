@@ -26,14 +26,17 @@ export default function Auth() {
       console.log("Full Name:", decoded.name);
       console.log("Avatar Picture:", decoded.picture);
       const res = await authenticateUser(decoded.email, decoded.name);
+      const data = await res.json();
+
+      console.log("--- Backend Authentication Response ---", data);
       // Set Context
       userContext?.setUserData({
         email: decoded.email,
         full_name: decoded.name,
-        uid: res.user.uid
+        uid: data.user.uid
       });
-      console.log("--- Backend Authentication Response ---", res);
       window.location.href = "/optimic";
+
     } catch (error) {
       console.error("Failed to decode Google token", error);
     }

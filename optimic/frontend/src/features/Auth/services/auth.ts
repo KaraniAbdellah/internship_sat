@@ -16,10 +16,7 @@ export const authenticateUser = async (email: string, name: string) => {
   if (!response.ok) {
     throw new Error("Authentication failed");
   }
-
-  console.log("Authentication successful, response:", await response.json());
-
-  return await response.json();
+  return response;
 };
 
 // 2. Example call to protected endpoint (Cookie will automatically be sent)

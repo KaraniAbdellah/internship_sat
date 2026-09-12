@@ -217,8 +217,8 @@ def logout_user(response: Response):
     response.delete_cookie(
         key="auth_token",
         httponly=True,
-        secure=False,
-        samesite="lax",
+        secure=True,
+        samesite="None",
     )
     return {"message": "Logged out successfully"}
 

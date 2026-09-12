@@ -3,3 +3,10 @@
 - gcloud config get-value project: get working gcloud project
 - gcloud config set project $MY_PROJECT_ID: switch to another project
 - gcloud iam service-accounts add-iam-policy-binding: add IAM policy to IAM service account.
+- gcloud builds submit --tag europe-central2-docker.pkg.dev/PROJECT_ID/REPOSITORY/APP # 
+  - PROJECT_ID = optimic
+  - REPOSITORY = your are Artifact REPOSITORY name = cloud-run-source-deploy
+  - APP = Image = optimic-backend
+- gcloud run deploy optimic-backend --image europe-central2-docker.pkg.dev/PROJECT_ID/REPOSITORY/APP --region europe-central2
+
+
